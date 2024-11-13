@@ -1,23 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout';
+import Home from './pages/Home';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function App() {
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    fetch('http://localhost:5000/api/hello')
-      .then(response => response.json())
-      .then(data => setMessage(data.message))
-      .catch(error => console.error('Error:', error));
-  }, []);
-
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>React + Flask</h1>
-        <p>{message}</p>
-      </header>
-    </div>
+    <Router>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          {/* Add more routes as needed */}
+        </Routes>
+      </Layout>
+    </Router>
   );
 }
 
