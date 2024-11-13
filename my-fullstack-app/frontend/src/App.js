@@ -6,6 +6,8 @@ import Blog from './pages/Blog';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import CreatePost from './pages/CreatePost';
+import BlogPost from './pages/BlogPost';
+
 
 
 function App() {
@@ -16,6 +18,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/create-post" element={<CreatePost />} />
+          <Route path="/blog/:id" element={<BlogPost />} />
 
           {/* Add more routes as needed */}
         </Routes>
