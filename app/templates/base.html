@@ -17,6 +17,12 @@
                 <li><a href="{{ url_for('blog.index') }}" class="hover:underline">Blog</a></li>
                 <li><a href="{{ url_for('main.about') }}" class="hover:underline">About</a></li>
                 <li><a href="{{ url_for('main.contact') }}" class="hover:underline">Contact</a></li>
+                {% if current_user.is_authenticated %}
+                    <li><a href="{{ url_for('auth.logout') }}" class="hover:underline">Logout</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('auth.login') }}" class="hover:underline">Login</a></li>
+                    <li><a href="{{ url_for('auth.register') }}" class="hover:underline">Register</a></li>
+                {% endif %}
             </ul>
         </div>
     </nav>
