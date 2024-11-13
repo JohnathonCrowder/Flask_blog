@@ -1,18 +1,27 @@
-from flask import Flask, render_template, url_for
+from flask import Flask
+from flask_login import LoginManager
+from .models import db
+from config import Config
+
+login_manager = LoginManager()
 
 def create_app():
     app = Flask(__name__)
+    app.config.from_object(Config)
 
-    @app.route('/')
-    def home():
-        return render_template('index.html', company_name="{COMPANY_NAME}")
+    db.init_app(app)
+    login_manager.init_app(app)
+    login_manager.login_view = 'auth.login'
 
-    @app.route('/about')
-    def about():
-        return render_template('about.html', company_name="{COMPANY_NAME}")
+    from .routes import main
+    from .auth import auth
+    from .blog import blog
 
-    @app.route('/contact')
-    def contact():
-        return render_template('contact.html', company_name="{COMPANY_NAME}")
+    app.register_blueprint(main)
+    app.register_blueprint(auth)
+    app.register_blueprint(blog)
+
+    with app.app_context():
+        db.create_all()
 
     return app
