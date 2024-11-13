@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
+
 
 function Blog() {
   const [posts, setPosts] = useState([]);
@@ -26,7 +28,12 @@ function Blog() {
 
   return (
     <div className="container my-5">
-      <h1 className="mb-4">Blog Posts</h1>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h1>Blog Posts</h1>
+        <Link to="/create-post" className="btn btn-primary">
+          Create New Post
+        </Link>
+      </div>
       <div className="row">
         {posts.map(post => (
           <div className="col-md-6 mb-4" key={post.id}>

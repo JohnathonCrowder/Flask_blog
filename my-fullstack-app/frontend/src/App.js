@@ -5,6 +5,8 @@ import Home from './pages/Home';
 import Blog from './pages/Blog';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import CreatePost from './pages/CreatePost';
+
 
 function App() {
   return (
@@ -13,6 +15,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/blog" element={<Blog />} />
+          <Route path="/create-post" element={<CreatePost />} />
+
           {/* Add more routes as needed */}
         </Routes>
       </Layout>
