@@ -1,25 +1,49 @@
 {% extends "base.html" %}
 
+{% block title %}Create New Post - {{ company_name }}{% endblock %}
+
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-4xl font-bold mb-8">Create New Post</h1>
-    
-    <form method="POST" class="max-w-2xl">
-        <div class="mb-4">
-            <label class="block mb-2">Title</label>
-            <input type="text" name="title" required
-                   class="w-full px-4 py-2 border rounded">
+<div class="bg-gray-50 min-h-screen py-12">
+    <div class="container mx-auto px-4 max-w-4xl">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="p-8">
+                <h1 class="text-3xl font-bold mb-8">Create New Post</h1>
+                
+                <form method="POST" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Title
+                        </label>
+                        <input type="text" 
+                               name="title" 
+                               required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Content
+                        </label>
+                        <textarea name="content" 
+                                  rows="12" 
+                                  required
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-4">
+                        <a href="{{ url_for('blog.index') }}" 
+                           class="px-6 py-3 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors duration-300">
+                            Cancel
+                        </a>
+                        <button type="submit" 
+                                class="px-6 py-3 rounded-lg text-white transition-colors duration-300"
+                                style="background-color: #4658fb;">
+                            Publish Post
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-        
-        <div class="mb-4">
-            <label class="block mb-2">Content</label>
-            <textarea name="content" rows="10" required
-                      class="w-full px-4 py-2 border rounded"></textarea>
-        </div>
-        
-        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">
-            Publish Post
-        </button>
-    </form>
+    </div>
 </div>
 {% endblock %}

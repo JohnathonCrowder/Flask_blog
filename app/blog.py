@@ -29,3 +29,29 @@ def create():
         return redirect(url_for('blog.post', post_id=post.id))
     
     return render_template('blog/create.html')
+
+@blog.route('/blog/edit/<int:post_id>', methods=['GET', 'POST'])
+@login_required
+def edit(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.author != current_user:
+        abort(403)
+    
+    if request.method == 'POST':
+        post.title = request.form.get('title')
+        post.content = request.form.get('content')
+        db.session.commit()
+        return redirect(url_for('blog.post', post_id=post.id))
+    
+    return render_template('blog/create.html', post=post)
+
+@blog.route('/blog/delete/<int:post_id>', methods=['POST'])
+@login_required
+def delete(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.author != current_user:
+        abort(403)
+    
+    db.session.delete(post)
+    db.session.commit()
+    return redirect(url_for('blog.index'))
