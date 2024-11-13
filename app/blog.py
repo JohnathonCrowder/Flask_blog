@@ -15,17 +15,45 @@ def post(post_id):
     post = Post.query.get_or_404(post_id)
     return render_template('blog/post.html', post=post)
 
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
+
 @blog.route('/blog/create', methods=['GET', 'POST'])
 @login_required
 def create():
     if request.method == 'POST':
         title = request.form.get('title')
+        subtitle = request.form.get('subtitle')
         content = request.form.get('content')
+        category = request.form.get('category')
+        tags = request.form.get('tags')
+        status = request.form.get('status', 'draft')
         
-        post = Post(title=title, content=content, author=current_user)
+        # Handle image upload
+        featured_image = None
+        if 'featured_image' in request.files:
+            file = request.files['featured_image']
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                filepath = os.path.join(current_app.root_path, 'static/uploads', filename)
+                file.save(filepath)
+                featured_image = f'uploads/{filename}'
+
+        post = Post(
+            title=title,
+            subtitle=subtitle,
+            content=content,
+            category=category,
+            tags=tags,
+            status=status,
+            featured_image=featured_image,
+            author=current_user
+        )
+        
         db.session.add(post)
         db.session.commit()
         
+        flash('Post created successfully!', 'success')
         return redirect(url_for('blog.post', post_id=post.id))
     
     return render_template('blog/create.html')
