@@ -7,11 +7,22 @@
     <div class="container mx-auto px-4 max-w-4xl">
         <!-- Post Header -->
         <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
-            <!-- Optional: Add featured image -->
+            <!-- Featured Image -->
+            {% if post.featured_image %}
+            <img src="{{ url_for('static', filename=post.featured_image) }}" 
+                 alt="{{ post.title }}" 
+                 class="w-full h-64 object-cover">
+            {% else %}
             <div class="h-64 bg-gradient-to-r from-blue-500 to-purple-500"></div>
+            {% endif %}
             
             <div class="p-8">
                 <h1 class="text-4xl font-bold mb-6">{{ post.title }}</h1>
+                
+                <!-- Subtitle if exists -->
+                {% if post.subtitle %}
+                <p class="text-xl text-gray-600 mb-6">{{ post.subtitle }}</p>
+                {% endif %}
                 
                 <!-- Author Info -->
                 <div class="flex items-center mb-8 border-b border-gray-200 pb-8">
@@ -30,6 +41,10 @@
                             <span>{{ post.created_at.strftime('%B %d, %Y') }}</span>
                             <span class="mx-2">•</span>
                             <span>{{ post.content|wordcount }} words</span>
+                            {% if post.category %}
+                            <span class="mx-2">•</span>
+                            <span>{{ post.category }}</span>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -38,6 +53,20 @@
                 <div class="prose prose-lg max-w-none">
                     {{ post.content|safe }}
                 </div>
+
+                <!-- Tags -->
+                {% if post.tags %}
+                <div class="mt-8">
+                    <h3 class="text-lg font-semibold mb-2">Tags:</h3>
+                    <div class="flex flex-wrap gap-2">
+                        {% for tag in post.tag_list %}
+                        <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                            {{ tag }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
 
@@ -51,10 +80,11 @@
                 Back to Blog
             </a>
 
-            {% if current_user.is_authenticated and current_user.id == post.author.id %}
+            {% if current_user.is_authenticated and (current_user.id == post.author.id or current_user.is_administrator()) %}
             <div class="flex space-x-4">
                 <a href="{{ url_for('blog.edit', post_id=post.id) }}" 
-                   class="inline-flex items-center px-4 py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-300">
+                   class="inline-flex items-center px-4 py-2 rounded-lg text-white transition-colors duration-300"
+                   style="background-color: #4658fb;">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                     </svg>

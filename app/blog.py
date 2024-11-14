@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, abort
 from flask_login import login_required, current_user
-from werkzeug.utils import secure_filename  # Add this import
+from werkzeug.utils import secure_filename
 import os
 from .models import db, Post, User
 
@@ -68,7 +68,8 @@ def create():
 @login_required
 def edit(post_id):
     post = Post.query.get_or_404(post_id)
-    if post.author != current_user:
+    # Check if the user is either the author or an admin
+    if post.author != current_user and not current_user.is_administrator():
         abort(403)
     
     if request.method == 'POST':
@@ -105,7 +106,7 @@ def edit(post_id):
 @login_required
 def delete(post_id):
     post = Post.query.get_or_404(post_id)
-    if post.author != current_user:
+    if post.author != current_user and not current_user.is_administrator():
         abort(403)
     
     # Delete featured image if it exists
@@ -118,7 +119,6 @@ def delete(post_id):
     db.session.commit()
     flash('Post deleted successfully!', 'success')
     return redirect(url_for('blog.index'))
-
 
 @blog.route('/blog/author/<int:user_id>')
 def author_profile(user_id):
