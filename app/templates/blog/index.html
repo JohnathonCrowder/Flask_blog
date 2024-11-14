@@ -1,134 +1,190 @@
 {% extends "base.html" %}
 
-{% block title %}Blog - {{ company_name }}{% endblock %}
+{% block title %}Tech Blog - CodeVault{% endblock %}
+
+{% block head %}
+<style>
+    .h-128 {
+        height: 32rem;
+    }
+
+    .blog-grid {
+        background: 
+            linear-gradient(90deg, rgba(33, 150, 243, 0.05) 1px, transparent 1px),
+            linear-gradient(rgba(33, 150, 243, 0.05) 1px, transparent 1px);
+        background-size: 40px 40px;
+    }
+
+    .post-card {
+        transition: all 0.3s ease;
+        background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(25, 33, 52, 0.9));
+        backdrop-filter: blur(10px);
+    }
+
+    .post-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0 30px rgba(33, 150, 243, 0.2);
+    }
+
+    .category-pill {
+        background: rgba(33, 150, 243, 0.1);
+        border: 1px solid rgba(33, 150, 243, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .category-pill:hover {
+        background: rgba(33, 150, 243, 0.2);
+        border-color: #2196f3;
+    }
+
+    .pagination-item {
+        transition: all 0.3s ease;
+    }
+
+    .pagination-item:hover {
+        transform: scale(1.05);
+    }
+
+    .filter-button {
+        transition: all 0.3s ease;
+    }
+
+    .filter-button:hover {
+        box-shadow: 0 0 15px rgba(33, 150, 243, 0.3);
+    }
+
+    .author-avatar {
+        background: linear-gradient(45deg, #2196f3, #b624ff);
+        padding: 2px;
+    }
+
+    .author-avatar span {
+        display: block;
+        background: #0f172a;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="bg-gray-50 min-h-screen py-12">
-    <div class="container mx-auto px-4 max-w-6xl">
-        <!-- Header Section -->
+<!-- Hero Section -->
+<section class="blog-grid -mt-8 py-20 px-4 relative">
+    <div class="container mx-auto max-w-6xl">
         <div class="text-center mb-12">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4" style="color: #4658fb;">Our Blog</h1>
-            <p class="text-gray-600 text-lg mb-8">Insights, updates, and stories from our team</p>
-            {% if current_user.is_authenticated and current_user.is_administrator() %}
-            <a href="{{ url_for('blog.create') }}" 
-               class="inline-flex items-center px-6 py-3 rounded-lg text-white transition-all duration-300 hover:shadow-lg"
-               style="background-color: #4658fb;">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                Create New Post
-            </a>
-            {% endif %}
+            <h1 class="text-4xl md:text-6xl font-bold mb-6">
+                <span class="bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink bg-clip-text text-transparent">
+                    The CodeVault Blog
+                </span>
+            </h1>
+            <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+                Dive into our latest articles on programming, technology trends, and developer insights.
+            </p>
         </div>
 
-        <!-- Blog Posts Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {% for post in posts.items %}
-            <article class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                <!-- Featured Image -->
-                {% if post.featured_image_data %}
-                <img src="{{ url_for('blog.serve_image', post_id=post.id) }}" 
-                     alt="{{ post.title }}" 
-                     class="w-full h-48 object-cover">
-                {% else %}
-                <div class="h-48 bg-gradient-to-r from-blue-500 to-purple-500"></div>
-                {% endif %}
-                
-                <div class="p-6">
-                    <!-- Post Meta -->
-                    <div class="flex items-center mb-4">
-                        <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                            <span class="text-gray-600 font-semibold">
-                                {{ post.author.username[0].upper() }}
+        <!-- Featured Post -->
+        {% if posts.items and posts.items[0] %}
+        {% set featured_post = posts.items[0] %}
+        <div class="post-card rounded-xl border border-neon-blue/20 p-8 mb-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    {% if featured_post.featured_image_data %}
+                    <img src="{{ url_for('blog.serve_image', post_id=featured_post.id) }}" 
+                         alt="{{ featured_post.title }}" 
+                         class="w-full h-128 object-cover rounded-lg">
+                    {% else %}
+                    <div class="w-full h-128 bg-gradient-to-br from-neon-blue/20 to-neon-purple/20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-code text-6xl text-neon-blue/50"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="space-y-4">
+                    <span class="category-pill px-3 py-1 rounded-full text-sm text-neon-blue">
+                        Featured Article
+                    </span>
+                    <h2 class="text-3xl font-bold text-white hover:text-neon-blue transition-colors">
+                        <a href="{{ url_for('blog.post', post_id=featured_post.id) }}">
+                            {{ featured_post.title }}
+                        </a>
+                    </h2>
+                    <p class="text-gray-400 line-clamp-3">
+                        {{ featured_post.subtitle or featured_post.content|striptags|truncate(150) }}
+                    </p>
+                    <div class="flex items-center">
+                        <div class="author-avatar rounded-full">
+                            <span class="flex items-center justify-center w-10 h-10 rounded-full text-neon-blue font-bold">
+                                {{ featured_post.author.username[0].upper() }}
                             </span>
                         </div>
                         <div class="ml-3">
-                            <p class="text-sm font-medium text-gray-900">
-                                <a href="{{ url_for('blog.author_profile', user_id=post.author.id) }}" 
-                                   class="hover:text-blue-600 transition-colors duration-300">
-                                    {{ post.author.username }}
-                                </a>
-                            </p>
-                            <p class="text-sm text-gray-500">
-                                {{ post.created_at.strftime('%B %d, %Y') }}
-                            </p>
+                            <p class="text-gray-300">{{ featured_post.author.username }}</p>
+                            <p class="text-sm text-gray-500">{{ featured_post.created_at.strftime('%B %d, %Y') }}</p>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
 
-                    <!-- Post Title & Preview -->
-                    <h2 class="text-xl font-bold mb-3 hover:text-blue-600 transition-colors duration-300">
+        <!-- Filter and Search -->
+        <div class="flex flex-wrap gap-4 mb-8">
+            <input type="text" 
+                   placeholder="Search articles..." 
+                   class="flex-grow px-4 py-2 rounded-lg bg-cyber-darker border border-neon-blue/20 text-gray-300 focus:outline-none focus:ring-2 focus:ring-neon-blue">
+            
+            {% for category in ['All', 'Python', 'JavaScript', 'DevOps', 'AI/ML', 'Web Development'] %}
+            <button class="filter-button px-4 py-2 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue">
+                {{ category }}
+            </button>
+            {% endfor %}
+        </div>
+
+        <!-- Posts Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for post in posts.items[1:] %}  {# Skip the first post as it's featured #}
+            <article class="post-card rounded-xl border border-neon-blue/20 overflow-hidden">
+                {% if post.featured_image_data %}
+                <img src="{{ url_for('blog.serve_image', post_id=post.id) }}" 
+                     alt="{{ post.title }}" 
+                     class="w-full h-96 object-cover">
+                {% else %}
+                <div class="w-full h-96 bg-gradient-to-br from-neon-blue/20 to-neon-purple/20 flex items-center justify-center">
+                    <i class="fas fa-terminal text-4xl text-neon-blue/50"></i>
+                </div>
+                {% endif %}
+                
+                <div class="p-6">
+                    {% if post.category %}
+                    <span class="category-pill px-3 py-1 rounded-full text-sm text-neon-blue mb-3 inline-block">
+                        {{ post.category }}
+                    </span>
+                    {% endif %}
+                    
+                    <h3 class="text-xl font-bold text-white hover:text-neon-blue transition-colors mb-2">
                         <a href="{{ url_for('blog.post', post_id=post.id) }}">
                             {{ post.title }}
                         </a>
-                    </h2>
-                    {% if post.subtitle %}
-                    <p class="text-gray-600 mb-4">{{ post.subtitle }}</p>
-                    {% endif %}
-                    <p class="text-gray-600 mb-4 line-clamp-3">
-                        {{ post.content|striptags|truncate(150) }}
+                    </h3>
+                    
+                    <p class="text-gray-400 mb-4 line-clamp-3">
+                        {{ post.subtitle or post.content|striptags|truncate(100) }}
                     </p>
-
-                    <!-- Category -->
-                    {% if post.category %}
-                    <div class="mb-4">
-                        <span class="px-2 py-1 text-sm bg-gray-100 text-gray-700 rounded">
-                            {{ post.category }}
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="author-avatar rounded-full">
+                                <span class="flex items-center justify-center w-8 h-8 rounded-full text-neon-blue text-sm font-bold">
+                                    {{ post.author.username[0].upper() }}
+                                </span>
+                            </div>
+                            <div class="ml-2">
+                                <p class="text-sm text-gray-400">{{ post.author.username }}</p>
+                            </div>
+                        </div>
+                        <span class="text-sm text-gray-500">
+                            {{ post.created_at.strftime('%b %d, %Y') }}
                         </span>
                     </div>
-                    {% endif %}
-
-                    <!-- Tags -->
-                    {% if post.tags %}
-                    <div class="flex flex-wrap gap-2 mb-4">
-                        {% for tag in post.tag_list[:3] %}
-                        <span class="px-2 py-1 text-xs font-medium bg-gray-100 rounded-full">
-                            {{ tag }}
-                        </span>
-                        {% endfor %}
-                        {% if post.tag_list|length > 3 %}
-                        <span class="px-2 py-1 text-xs font-medium bg-gray-100 rounded-full">
-                            +{{ post.tag_list|length - 3 }}
-                        </span>
-                        {% endif %}
-                    </div>
-                    {% endif %}
-
-                    <!-- Status Badge (if user is author or admin) -->
-                    {% if current_user.is_authenticated and (current_user.id == post.author.id or current_user.is_administrator()) %}
-                    <div class="mb-4">
-                        <span class="px-2 py-1 text-xs font-semibold rounded-full 
-                            {% if post.status == 'published' %}
-                                bg-green-100 text-green-800
-                            {% else %}
-                                bg-yellow-100 text-yellow-800
-                            {% endif %}">
-                            {{ post.status.capitalize() }}
-                        </span>
-                    </div>
-                    {% endif %}
-
-                    <!-- Read More Link -->
-                    <a href="{{ url_for('blog.post', post_id=post.id) }}" 
-                       class="inline-flex items-center text-sm font-medium hover:text-blue-600 transition-colors duration-300"
-                       style="color: #4658fb;">
-                        Read more
-                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                    </a>
                 </div>
             </article>
-            {% else %}
-            <div class="col-span-full text-center py-12">
-                <p class="text-xl text-gray-600">No posts found.</p>
-                {% if current_user.is_authenticated %}
-                <a href="{{ url_for('blog.create') }}" 
-                   class="inline-block mt-4 px-6 py-3 rounded-lg text-white"
-                   style="background-color: #4658fb;">
-                    Create Your First Post
-                </a>
-                {% endif %}
-            </div>
             {% endfor %}
         </div>
 
@@ -137,23 +193,59 @@
         <div class="mt-12 flex justify-center items-center space-x-4">
             {% if posts.has_prev %}
             <a href="{{ url_for('blog.index', page=posts.prev_num) }}" 
-               class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors duration-300">
+               class="pagination-item px-4 py-2 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue">
                 Previous
             </a>
             {% endif %}
 
-            <span class="text-gray-600">
-                Page {{ posts.page }} of {{ posts.pages }}
-            </span>
+            {% for page in posts.iter_pages() %}
+                {% if page %}
+                    {% if page == posts.page %}
+                    <span class="px-4 py-2 rounded-lg bg-neon-blue text-white">
+                        {{ page }}
+                    </span>
+                    {% else %}
+                    <a href="{{ url_for('blog.index', page=page) }}" 
+                       class="pagination-item px-4 py-2 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue">
+                        {{ page }}
+                    </a>
+                    {% endif %}
+                {% else %}
+                <span class="px-4 py-2 text-gray-500">...</span>
+                {% endif %}
+            {% endfor %}
 
             {% if posts.has_next %}
             <a href="{{ url_for('blog.index', page=posts.next_num) }}" 
-               class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors duration-300">
+               class="pagination-item px-4 py-2 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue">
                 Next
             </a>
             {% endif %}
         </div>
         {% endif %}
     </div>
-</div>
+</section>
+
+<!-- Newsletter Signup -->
+<section class="py-16 bg-cyber-darker/50">
+    <div class="container mx-auto max-w-4xl px-4">
+        <div class="gradient-border rounded-xl p-8 text-center">
+            <h2 class="text-3xl font-bold mb-4 bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
+                Stay Updated
+            </h2>
+            <p class="text-gray-400 mb-6">
+                Subscribe to our newsletter for the latest tech insights and tutorials delivered straight to your inbox.
+            </p>
+            <form class="flex flex-col md:flex-row gap-4 justify-center">
+                <input type="email" 
+                       placeholder="Enter your email" 
+                       class="flex-grow px-4 py-2 rounded-lg bg-cyber-darker border border-neon-blue/20 text-gray-300 focus:outline-none focus:ring-2 focus:ring-neon-blue">
+                <button type="submit" 
+                        class="px-6 py-2 rounded-lg bg-gradient-to-r from-neon-blue to-neon-purple text-white hover:opacity-90 transition-opacity">
+                    Subscribe
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
 {% endblock %}
