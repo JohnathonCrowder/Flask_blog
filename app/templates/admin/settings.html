@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Site Settings - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="bg-gray-100 min-h-screen py-8">
+    <div class="container mx-auto px-4 max-w-6xl">
+        <div class="mb-6 flex justify-between items-center">
+            <h1 class="text-3xl font-bold text-gray-800">Site Settings</h1>
+            <a href="{{ url_for('admin.admin_dashboard') }}" 
+               class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+                Back to Dashboard
+            </a>
+        </div>
+
+        <form method="POST" class="space-y-6">
+            <!-- General Settings -->
+            <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                <div class="px-4 py-5 sm:px-6 bg-gray-50 border-b border-gray-200">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                        General Settings
+                    </h3>
+                    <p class="mt-1 text-sm text-gray-500">
+                        Basic configuration for your website.
+                    </p>
+                </div>
+                <div class="px-4 py-5 sm:p-6">
+                    <div class="grid grid-cols-1 gap-6">
+                        <div>
+                            <label for="site_name" class="block text-sm font-medium text-gray-700">Site Name</label>
+                            <input type="text" name="site_name" id="site_name" 
+                                   value="{{ settings.site_name if settings else '' }}"
+                                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="site_description" class="block text-sm font-medium text-gray-700">Site Description</label>
+                            <textarea name="site_description" id="site_description" rows="3" 
+                                      class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">{{ settings.site_description if settings else '' }}</textarea>
+                        </div>
+                        <div>
+                            <label for="contact_email" class="block text-sm font-medium text-gray-700">Contact Email</label>
+                            <input type="email" name="contact_email" id="contact_email" 
+                                   value="{{ settings.contact_email if settings else '' }}"
+                                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="posts_per_page" class="block text-sm font-medium text-gray-700">Posts Per Page</label>
+                            <input type="number" name="posts_per_page" id="posts_per_page" 
+                                   value="{{ settings.posts_per_page if settings else 10 }}"
+                                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Media Settings -->
+            <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                <div class="px-4 py-5 sm:px-6 bg-gray-50 border-b border-gray-200">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                        Social Media Links
+                    </h3>
+                    <p class="mt-1 text-sm text-gray-500">
+                        Connect your social media accounts.
+                    </p>
+                </div>
+                <div class="px-4 py-5 sm:p-6">
+                    <div class="grid grid-cols-1 gap-6">
+                        <div>
+                            <label for="facebook_url" class="block text-sm font-medium text-gray-700">Facebook URL</label>
+                            <input type="url" name="facebook_url" id="facebook_url" 
+                                   value="{{ settings.facebook_url if settings else '' }}"
+                                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="twitter_url" class="block text-sm font-medium text-gray-700">Twitter URL</label>
+                            <input type="url" name="twitter_url" id="twitter_url" 
+                                   value="{{ settings.twitter_url if settings else '' }}"
+                                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="instagram_url" class="block text-sm font-medium text-gray-700">Instagram URL</label>
+                            <input type="url" name="instagram_url" id="instagram_url" 
+                                   value="{{ settings.instagram_url if settings else '' }}"
+                                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="linkedin_url" class="block text-sm font-medium text-gray-700">LinkedIn URL</label>
+                            <input type="url" name="linkedin_url" id="linkedin_url" 
+                                   value="{{ settings.linkedin_url if settings else '' }}"
+                                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Site Options -->
+            <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                <div class="px-4 py-5 sm:px-6 bg-gray-50 border-b border-gray-200">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                        Site Options
+                    </h3>
+                    <p class="mt-1 text-sm text-gray-500">
+                        Additional configuration options.
+                    </p>
+                </div>
+                <div class="px-4 py-5 sm:p-6">
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input type="checkbox" name="maintenance_mode" id="maintenance_mode"
+                                       {% if settings and settings.maintenance_mode %}checked{% endif %}
+                                       class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="maintenance_mode" class="font-medium text-gray-700">Maintenance Mode</label>
+                                <p class="text-gray-500">Enable this to show a maintenance page to visitors.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input type="checkbox" name="allow_registration" id="allow_registration"
+                                       {% if settings and settings.allow_registration %}checked{% endif %}
+                                       class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="allow_registration" class="font-medium text-gray-700">Allow Registration</label>
+                                <p class="text-gray-500">Allow new users to register on the site.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex justify-end">
+                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Save Settings
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

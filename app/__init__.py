@@ -5,6 +5,7 @@ from .models import db, User
 from config import Config
 from .admin import admin
 from . import commands
+from .models import SiteSettings
 
 
 
@@ -39,6 +40,11 @@ def create_app():
     app.register_blueprint(admin)
 
     commands.init_app(app)
+
+    @app.context_processor
+    def inject_settings():
+        settings = SiteSettings.query.first()
+        return dict(site_settings=settings)
 
 
     return app

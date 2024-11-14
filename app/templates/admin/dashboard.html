@@ -34,7 +34,8 @@
                 <a href="{{ url_for('admin.manage_users') }}" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300 text-center">Manage Users</a>
                 <a href="{{ url_for('admin.manage_posts') }}" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition duration-300 text-center">Manage Posts</a>
                 <a href="{{ url_for('blog.create') }}" class="bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600 transition duration-300 text-center">Create New Post</a>
-                <a href="#" class="bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition duration-300 text-center">Site Settings</a>
+                <a href="{{ url_for('admin.site_settings') }}" class="bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition duration-300 text-center">Site Settings</a>
+
             </div>
         </div>
 

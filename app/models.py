@@ -42,3 +42,23 @@ class Post(db.Model):
     @property
     def tag_list(self):
         return [tag.strip() for tag in self.tags.split(',')] if self.tags else []
+    
+
+class SiteSettings(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    site_name = db.Column(db.String(100), default='My Blog')
+    site_description = db.Column(db.Text, default='A simple blog website')
+    contact_email = db.Column(db.String(120))
+    posts_per_page = db.Column(db.Integer, default=10)
+    maintenance_mode = db.Column(db.Boolean, default=False)
+    allow_registration = db.Column(db.Boolean, default=True)
+    
+    # Social media links
+    facebook_url = db.Column(db.String(200))
+    twitter_url = db.Column(db.String(200))
+    instagram_url = db.Column(db.String(200))
+    linkedin_url = db.Column(db.String(200))
+
+    # Meta settings
+    meta_keywords = db.Column(db.String(200))
+    meta_description = db.Column(db.String(200))

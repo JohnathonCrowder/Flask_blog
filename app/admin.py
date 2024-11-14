@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
-from .models import db, User, Post
+from .models import db, User, Post, SiteSettings
 from functools import wraps
 from datetime import datetime, timedelta
 from flask import request, url_for
@@ -81,6 +81,38 @@ def manage_posts():
     authors = User.query.all()
 
     return render_template('admin/posts.html', posts=posts, authors=authors)
+
+
+@admin.route('/admin/settings', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def site_settings():
+    if request.method == 'POST':
+        settings = SiteSettings.query.first()
+        if not settings:
+            settings = SiteSettings()
+            db.session.add(settings)
+        
+        # Update settings
+        settings.site_name = request.form.get('site_name', '')
+        settings.site_description = request.form.get('site_description', '')
+        settings.contact_email = request.form.get('contact_email', '')
+        settings.posts_per_page = int(request.form.get('posts_per_page', 10))
+        settings.maintenance_mode = 'maintenance_mode' in request.form
+        settings.allow_registration = 'allow_registration' in request.form
+        
+        # Social media links
+        settings.facebook_url = request.form.get('facebook_url', '')
+        settings.twitter_url = request.form.get('twitter_url', '')
+        settings.instagram_url = request.form.get('instagram_url', '')
+        settings.linkedin_url = request.form.get('linkedin_url', '')
+
+        db.session.commit()
+        flash('Settings updated successfully!', 'success')
+        return redirect(url_for('admin.site_settings'))
+
+    settings = SiteSettings.query.first()
+    return render_template('admin/settings.html', settings=settings)
 
 @admin.route('/admin/toggle_admin/<int:user_id>', methods=['POST'])
 @login_required
