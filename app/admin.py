@@ -3,6 +3,8 @@ from flask_login import login_required, current_user
 from .models import db, User, Post
 from functools import wraps
 from datetime import datetime, timedelta
+from flask import request, url_for
+from sqlalchemy import or_
 
 
 admin = Blueprint('admin', __name__)
@@ -52,8 +54,27 @@ def manage_users():
 @login_required
 @admin_required
 def manage_posts():
-    posts = Post.query.all()
-    return render_template('admin/posts.html', posts=posts)
+    page = request.args.get('page', 1, type=int)
+    status = request.args.get('status')
+    author_id = request.args.get('author')
+    search = request.args.get('search')
+
+    query = Post.query
+
+    if status:
+        query = query.filter(Post.status == status)
+    if author_id:
+        query = query.filter(Post.user_id == author_id)
+    if search:
+        query = query.filter(or_(
+            Post.title.ilike(f'%{search}%'),
+            Post.content.ilike(f'%{search}%')
+        ))
+
+    posts = query.order_by(Post.created_at.desc()).paginate(page=page, per_page=10)
+    authors = User.query.all()
+
+    return render_template('admin/posts.html', posts=posts, authors=authors)
 
 @admin.route('/admin/toggle_admin/<int:user_id>', methods=['POST'])
 @login_required
