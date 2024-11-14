@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash,
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename  # Add this import
 import os
-from .models import db, Post
+from .models import db, Post, User
 
 blog = Blueprint('blog', __name__)
 
@@ -118,3 +118,11 @@ def delete(post_id):
     db.session.commit()
     flash('Post deleted successfully!', 'success')
     return redirect(url_for('blog.index'))
+
+
+@blog.route('/blog/author/<int:user_id>')
+def author_profile(user_id):
+    author = User.query.get_or_404(user_id)
+    page = request.args.get('page', 1, type=int)
+    posts = Post.query.filter_by(author=author).order_by(Post.created_at.desc()).paginate(page=page, per_page=5)
+    return render_template('blog/author.html', author=author, posts=posts)

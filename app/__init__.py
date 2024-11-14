@@ -4,12 +4,16 @@ from flask_migrate import Migrate
 from .models import db, User
 from config import Config
 
+
+
+
 login_manager = LoginManager()
 migrate = Migrate()
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
 
 def create_app():
     app = Flask(__name__)
@@ -28,5 +32,7 @@ def create_app():
     app.register_blueprint(main)
     app.register_blueprint(auth)
     app.register_blueprint(blog)
+
+
 
     return app

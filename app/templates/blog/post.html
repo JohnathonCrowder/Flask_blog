@@ -21,7 +21,11 @@
                         </span>
                     </div>
                     <div class="ml-4">
-                        <p class="font-medium text-gray-900">{{ post.author.username }}</p>
+                        <p class="font-medium text-gray-900">
+                            <a href="{{ url_for('blog.author_profile', user_id=post.author.id) }}" class="hover:text-blue-600">
+                                {{ post.author.username }}
+                            </a>
+                        </p>
                         <div class="flex items-center text-sm text-gray-500">
                             <span>{{ post.created_at.strftime('%B %d, %Y') }}</span>
                             <span class="mx-2">•</span>
