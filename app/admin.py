@@ -2,6 +2,8 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from .models import db, User, Post
 from functools import wraps
+from datetime import datetime, timedelta
+
 
 admin = Blueprint('admin', __name__)
 
@@ -18,7 +20,26 @@ def admin_required(f):
 @login_required
 @admin_required
 def admin_dashboard():
-    return render_template('admin/dashboard.html')
+    # Get total counts
+    total_users = User.query.count()
+    total_posts = Post.query.count()
+
+    # Get counts for the last 7 days
+    seven_days_ago = datetime.utcnow() - timedelta(days=7)
+    new_users_count = User.query.filter(User.created_at >= seven_days_ago).count()
+    new_posts_count = Post.query.filter(Post.created_at >= seven_days_ago).count()
+
+    # Get recent users and posts
+    recent_users = User.query.order_by(User.created_at.desc()).limit(5).all()
+    recent_posts = Post.query.order_by(Post.created_at.desc()).limit(5).all()
+
+    return render_template('admin/dashboard.html',
+                           total_users=total_users,
+                           total_posts=total_posts,
+                           new_users_count=new_users_count,
+                           new_posts_count=new_posts_count,
+                           recent_users=recent_users,
+                           recent_posts=recent_posts)
 
 @admin.route('/admin/users')
 @login_required
