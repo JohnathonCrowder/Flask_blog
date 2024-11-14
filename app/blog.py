@@ -23,12 +23,28 @@ def serve_image(post_id):
 @blog.route('/blog')
 def index():
     page = request.args.get('page', 1, type=int)
-    posts = Post.query.filter_by(status='published').order_by(Post.created_at.desc()).paginate(page=page, per_page=5)
+    
+    # Base query
+    query = Post.query
+    
+    # If user is not admin, only show published posts
+    if not current_user.is_authenticated or not current_user.is_administrator():
+        query = query.filter_by(status='published')
+    
+    posts = query.order_by(Post.created_at.desc()).paginate(page=page, per_page=5)
     return render_template('blog/index.html', posts=posts)
 
 @blog.route('/blog/post/<int:post_id>')
 def post(post_id):
     post = Post.query.get_or_404(post_id)
+    
+    # If the post is a draft and the user is not an admin, return 404
+    if post.status != 'published' and (
+        not current_user.is_authenticated or 
+        not current_user.is_administrator()
+    ):
+        abort(404)
+    
     return render_template('blog/post.html', post=post)
 
 @blog.route('/blog/create', methods=['GET', 'POST'])
@@ -78,7 +94,7 @@ def create():
 @login_required
 def edit(post_id):
     if not current_user.is_administrator():
-        abort(403)
+        abort(403)  # Only admins can edit posts
     
     post = Post.query.get_or_404(post_id)
     
@@ -90,11 +106,14 @@ def edit(post_id):
         post.tags = request.form.get('tags')
         post.status = request.form.get('status')
         
+        # Handle image upload
         if 'featured_image' in request.files:
             file = request.files['featured_image']
             if file and file.filename and allowed_file(file.filename):
+                # Read the file data and mime type
                 image_data = file.read()
                 mimetype = file.content_type
+                
                 post.featured_image_data = image_data
                 post.featured_image_mimetype = mimetype
         
@@ -123,10 +142,17 @@ def delete(post_id):
 def author_profile(user_id):
     author = User.query.get_or_404(user_id)
     page = request.args.get('page', 1, type=int)
-    posts = Post.query.filter_by(author=author, status='published').order_by(Post.created_at.desc()).paginate(page=page, per_page=5)
+    
+    # Base query
+    query = Post.query.filter_by(author=author)
+    
+    # If user is not admin, only show published posts
+    if not current_user.is_authenticated or not current_user.is_administrator():
+        query = query.filter_by(status='published')
+    
+    posts = query.order_by(Post.created_at.desc()).paginate(page=page, per_page=5)
     return render_template('blog/author.html', author=author, posts=posts)
 
-# Optional: Add a route for drafts that only admins can see
 @blog.route('/blog/drafts')
 @login_required
 def drafts():
@@ -136,3 +162,30 @@ def drafts():
     page = request.args.get('page', 1, type=int)
     drafts = Post.query.filter_by(status='draft').order_by(Post.created_at.desc()).paginate(page=page, per_page=5)
     return render_template('blog/drafts.html', posts=drafts)
+
+# Optional: Add a search route
+@blog.route('/blog/search')
+def search():
+    query = request.args.get('q', '')
+    page = request.args.get('page', 1, type=int)
+    
+    if query:
+        base_query = Post.query.filter(
+            or_(
+                Post.title.ilike(f'%{query}%'),
+                Post.content.ilike(f'%{query}%'),
+                Post.tags.ilike(f'%{query}%')
+            )
+        )
+        
+        # If user is not admin, only show published posts in search results
+        if not current_user.is_authenticated or not current_user.is_administrator():
+            base_query = base_query.filter_by(status='published')
+        
+        search_results = base_query.order_by(Post.created_at.desc()).paginate(page=page, per_page=10)
+    else:
+        search_results = None
+    
+    return render_template('blog/search.html', 
+                          query=query,
+                          results=search_results)

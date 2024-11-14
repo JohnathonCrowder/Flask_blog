@@ -5,6 +5,15 @@
 {% block head %}
 {{ super() }}
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<style>
+    #drop-zone {
+        transition: border-color 0.2s ease-in-out;
+    }
+    #drop-zone.border-blue-500 {
+        border-color: #3B82F6;
+    }
+</style>
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 {% endblock %}
 
@@ -42,34 +51,35 @@
                     </div>
 
                     <!-- Featured Image Section -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Featured Image
-                        </label>
-                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
-                            <div class="space-y-1 text-center">
-                                {% if post and post.featured_image_data %}
-                                    <img src="{{ url_for('blog.serve_image', post_id=post.id) }}" 
-                                         alt="Current featured image" 
-                                         class="mx-auto h-32 w-auto mb-4">
-                                    <p class="text-sm text-gray-500 mb-4">Current image shown above. Upload a new one to replace it:</p>
-                                {% endif %}
-                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                                <div class="flex text-sm text-gray-600">
-                                    <label for="featured_image" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
-                                        <span>Upload a file</span>
-                                        <input id="featured_image" name="featured_image" type="file" class="sr-only" accept="image/*">
-                                    </label>
-                                    <p class="pl-1">or drag and drop</p>
-                                </div>
-                                <p class="text-xs text-gray-500">
-                                    PNG, JPG, GIF up to 10MB
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+<div>
+    <label class="block text-sm font-medium text-gray-700 mb-2">
+        Featured Image
+    </label>
+    <div id="drop-zone" 
+         class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:border-blue-500 transition-colors duration-200">
+        <div class="space-y-1 text-center" id="upload-content">
+            {% if post and post.featured_image_data %}
+                <img src="{{ url_for('blog.serve_image', post_id=post.id) }}" 
+                     alt="Current featured image" 
+                     class="mx-auto h-32 w-auto mb-4">
+                <p class="text-sm text-gray-500 mb-4">Current image shown above. Upload a new one to replace it:</p>
+            {% endif %}
+            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <div class="flex text-sm text-gray-600 justify-center">
+                <label for="featured_image" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                    <span>Upload a file</span>
+                    <input id="featured_image" name="featured_image" type="file" class="sr-only" accept="image/*">
+                </label>
+                <p class="pl-1">or drag and drop</p>
+            </div>
+            <p class="text-xs text-gray-500">
+                PNG, JPG, GIF up to 10MB
+            </p>
+        </div>
+    </div>
+</div>
 
                     <!-- Category Section -->
                     <div>
@@ -150,6 +160,90 @@
 </div>
 
 <script>
+
+    // Drag and drop functionality
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('featured_image');
+const uploadContent = document.getElementById('upload-content');
+
+// Prevent default drag behaviors
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, preventDefaults, false);
+    document.body.addEventListener(eventName, preventDefaults, false);
+});
+
+// Highlight drop zone when item is dragged over it
+['dragenter', 'dragover'].forEach(eventName => {
+    dropZone.addEventListener(eventName, highlight, false);
+});
+
+['dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, unhighlight, false);
+});
+
+// Handle dropped files
+dropZone.addEventListener('drop', handleDrop, false);
+
+function preventDefaults (e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+function highlight(e) {
+    dropZone.classList.add('border-blue-500', 'border-2');
+}
+
+function unhighlight(e) {
+    dropZone.classList.remove('border-blue-500', 'border-2');
+}
+
+function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+
+    handleFiles(files);
+}
+
+function handleFiles(files) {
+    if (files.length) {
+        const file = files[0];
+        if (file.type.startsWith('image/')) {
+            fileInput.files = files;
+            previewFile(file);
+        } else {
+            alert('Please upload an image file');
+        }
+    }
+}
+
+function previewFile(file) {
+    let reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = function() {
+        const img = document.createElement('img');
+        img.src = reader.result;
+        img.className = 'mx-auto h-32 w-auto mb-4';
+        
+        // Remove existing preview if any
+        const existingPreview = uploadContent.querySelector('img');
+        if (existingPreview) {
+            existingPreview.remove();
+        }
+        
+        // Add new preview
+        uploadContent.insertBefore(img, uploadContent.firstChild);
+    }
+}
+
+// Handle file input change
+fileInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        previewFile(file);
+    }
+});
+
+
     // Initialize Quill editor
     var quill = new Quill('#editor', {
         theme: 'snow',
