@@ -1,50 +1,149 @@
 {% extends "base.html" %}
 
-{% block title %}Contact - blog{% endblock %}
+{% block title %}Contact - {{ site_settings.site_name if site_settings else 'Our Blog' }}{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-4xl font-bold mb-6" style="color: #4658fb;">Contact Us</h1>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="bg-white shadow-md rounded-lg p-6">
-            <h2 class="text-2xl font-semibold mb-4" style="color: #4658fb;">Get in Touch</h2>
-            <form action="#" method="POST">
-                <div class="mb-4">
-                    <label for="name" class="block mb-2">Name</label>
-                    <input type="text" id="name" name="name" class="w-full px-3 py-2 border rounded-lg" required>
-                </div>
-                <div class="mb-4">
-                    <label for="email" class="block mb-2">Email</label>
-                    <input type="email" id="email" name="email" class="w-full px-3 py-2 border rounded-lg" required>
-                </div>
-                <div class="mb-4">
-                    <label for="message" class="block mb-2">Message</label>
-                    <textarea id="message" name="message" rows="4" class="w-full px-3 py-2 border rounded-lg" required></textarea>
-                </div>
-                <button type="submit" class="px-4 py-2 text-white rounded-lg" style="background-color: #4658fb;">Send Message</button>
-            </form>
+<div class="bg-gray-50 min-h-screen py-12">
+    <div class="container mx-auto px-4 max-w-6xl">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4" style="color: #4658fb;">Contact Us</h1>
+            {% if site_settings and site_settings.site_description %}
+            <p class="text-xl text-gray-600">{{ site_settings.site_description }}</p>
+            {% endif %}
         </div>
-        
-        <div class="bg-white shadow-md rounded-lg p-6">
-            <h2 class="text-2xl font-semibold mb-4" style="color: #4658fb;">Contact Information</h2>
-            <p class="mb-2"><i class="fas fa-map-marker-alt mr-2"></i><strong>Address:</strong> 123 Tech Street, Springfield, MO 65806</p>
-            <p class="mb-2"><i class="fas fa-phone mr-2"></i><strong>Phone:</strong> (123) 456-7890</p>
-            <p class="mb-2"><i class="fas fa-envelope mr-2"></i><strong>Email:</strong> info@blog.com</p>
-            <p class="mb-4"><i class="fas fa-clock mr-2"></i><strong>Business Hours:</strong> Monday - Friday, 9am - 5pm</p>
-            <div class="mt-6">
-                <h3 class="text-xl font-semibold mb-2">Follow Us</h3>
-                <div class="flex space-x-4 mb-6">
-                    <a href="#" class="text-blue-600 hover:text-blue-700"><i class="fab fa-facebook fa-2x"></i></a>
-                    <a href="#" class="text-blue-400 hover:text-blue-500"><i class="fab fa-twitter fa-2x"></i></a>
-                    <a href="#" class="text-pink-600 hover:text-pink-700"><i class="fab fa-instagram fa-2x"></i></a>
-                    <a href="#" class="text-blue-700 hover:text-blue-800"><i class="fab fa-linkedin fa-2x"></i></a>
-                </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <!-- Contact Form -->
+            <div class="bg-white rounded-xl shadow-md p-8">
+                <h2 class="text-2xl font-bold mb-6" style="color: #4658fb;">Send us a message</h2>
+                <form action="#" method="POST" class="space-y-6">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                        <input type="text" 
+                               name="name" 
+                               id="name" 
+                               required 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" 
+                               name="email" 
+                               id="email" 
+                               required 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                        <input type="text" 
+                               name="subject" 
+                               id="subject" 
+                               required 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                        <textarea name="message" 
+                                  id="message" 
+                                  rows="5" 
+                                  required 
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+                    <button type="submit" 
+                            class="w-full px-6 py-3 text-white rounded-lg transition-all duration-300 hover:shadow-lg"
+                            style="background-color: #4658fb;">
+                        Send Message
+                    </button>
+                </form>
             </div>
-            <div class="mt-6">
-                <h3 class="text-xl font-semibold mb-2">Our Location</h3>
-                <div class="aspect-w-16 aspect-h-9">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d101724.30802730608!2d-93.37872488760708!3d37.179212746852166!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x87cf62f745c8983f%3A0x6bfd6cb31e690da0!2sSpringfield%2C%20MO!5e0!3m2!1sen!2sus!4v1726078170084!5m2!1sen!2sus" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+            <!-- Contact Information -->
+            <div class="space-y-8">
+                <!-- General Contact Info -->
+                <div class="bg-white rounded-xl shadow-md p-8">
+                    <h2 class="text-2xl font-bold mb-6" style="color: #4658fb;">Contact Information</h2>
+                    {% if site_settings and site_settings.contact_email %}
+                    <div class="flex items-start mb-4">
+                        <div class="flex-shrink-0">
+                            <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-900">Email</p>
+                            <a href="mailto:{{ site_settings.contact_email }}" class="text-blue-600 hover:underline">
+                                {{ site_settings.contact_email }}
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Social Media Links -->
+                {% if site_settings and (site_settings.facebook_url or site_settings.twitter_url or site_settings.instagram_url or site_settings.linkedin_url) %}
+                <div class="bg-white rounded-xl shadow-md p-8">
+                    <h2 class="text-2xl font-bold mb-6" style="color: #4658fb;">Follow Us</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        {% if site_settings.facebook_url %}
+                        <a href="{{ site_settings.facebook_url }}" target="_blank" rel="noopener noreferrer" 
+                           class="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors duration-300">
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+                            </svg>
+                            <span>Facebook</span>
+                        </a>
+                        {% endif %}
+                        
+                        {% if site_settings.twitter_url %}
+                        <a href="{{ site_settings.twitter_url }}" target="_blank" rel="noopener noreferrer" 
+                           class="flex items-center space-x-2 text-gray-700 hover:text-blue-400 transition-colors duration-300">
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
+                            </svg>
+                            <span>Twitter</span>
+                        </a>
+                        {% endif %}
+                        
+                        {% if site_settings.instagram_url %}
+                        <a href="{{ site_settings.instagram_url }}" target="_blank" rel="noopener noreferrer" 
+                           class="flex items-center space-x-2 text-gray-700 hover:text-pink-600 transition-colors duration-300">
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                            <span>Instagram</span>
+                        </a>
+                        {% endif %}
+                        
+                        {% if site_settings.linkedin_url %}
+                        <a href="{{ site_settings.linkedin_url }}" target="_blank" rel="noopener noreferrer" 
+                           class="flex items-center space-x-2 text-gray-700 hover:text-blue-700 transition-colors duration-300">
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                            </svg>
+                            <span>LinkedIn</span>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Business Hours -->
+                <div class="bg-white rounded-xl shadow-md p-8">
+                    <h2 class="text-2xl font-bold mb-6" style="color: #4658fb;">Business Hours</h2>
+                    <ul class="space-y-2">
+                        <li class="flex justify-between">
+                            <span class="text-gray-600">Monday - Friday</span>
+                            <span class="font-semibold">9:00 AM - 5:00 PM</span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span class="text-gray-600">Saturday</span>
+                            <span class="font-semibold">10:00 AM - 2:00 PM</span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span class="text-gray-600">Sunday</span>
+                            <span class="font-semibold">Closed</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
