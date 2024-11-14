@@ -1,8 +1,13 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
 from flask_login import login_required, current_user
+from werkzeug.utils import secure_filename  # Add this import
+import os
 from .models import db, Post
 
 blog = Blueprint('blog', __name__)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
 
 @blog.route('/blog')
 def index():
@@ -14,9 +19,6 @@ def index():
 def post(post_id):
     post = Post.query.get_or_404(post_id)
     return render_template('blog/post.html', post=post)
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
 
 @blog.route('/blog/create', methods=['GET', 'POST'])
 @login_required
@@ -33,9 +35,13 @@ def create():
         featured_image = None
         if 'featured_image' in request.files:
             file = request.files['featured_image']
-            if file and allowed_file(file.filename):
+            if file and file.filename and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
-                filepath = os.path.join(current_app.root_path, 'static/uploads', filename)
+                # Ensure upload directory exists
+                upload_dir = os.path.join(current_app.root_path, 'static', 'uploads')
+                os.makedirs(upload_dir, exist_ok=True)
+                # Save the file
+                filepath = os.path.join(upload_dir, filename)
                 file.save(filepath)
                 featured_image = f'uploads/{filename}'
 
@@ -67,8 +73,30 @@ def edit(post_id):
     
     if request.method == 'POST':
         post.title = request.form.get('title')
+        post.subtitle = request.form.get('subtitle')
         post.content = request.form.get('content')
+        post.category = request.form.get('category')
+        post.tags = request.form.get('tags')
+        post.status = request.form.get('status')
+        
+        # Handle image upload
+        if 'featured_image' in request.files:
+            file = request.files['featured_image']
+            if file and file.filename and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                upload_dir = os.path.join(current_app.root_path, 'static', 'uploads')
+                os.makedirs(upload_dir, exist_ok=True)
+                filepath = os.path.join(upload_dir, filename)
+                file.save(filepath)
+                # Delete old image if it exists
+                if post.featured_image:
+                    old_filepath = os.path.join(current_app.root_path, 'static', post.featured_image)
+                    if os.path.exists(old_filepath):
+                        os.remove(old_filepath)
+                post.featured_image = f'uploads/{filename}'
+        
         db.session.commit()
+        flash('Post updated successfully!', 'success')
         return redirect(url_for('blog.post', post_id=post.id))
     
     return render_template('blog/create.html', post=post)
@@ -80,6 +108,13 @@ def delete(post_id):
     if post.author != current_user:
         abort(403)
     
+    # Delete featured image if it exists
+    if post.featured_image:
+        filepath = os.path.join(current_app.root_path, 'static', post.featured_image)
+        if os.path.exists(filepath):
+            os.remove(filepath)
+    
     db.session.delete(post)
     db.session.commit()
+    flash('Post deleted successfully!', 'success')
     return redirect(url_for('blog.index'))
