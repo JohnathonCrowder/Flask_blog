@@ -1,42 +1,219 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{% block title %}blog{% endblock %}</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        {% block head %}{% endblock %}
-    </head>
-<body class="flex flex-col min-h-full">
-    <nav class="text-white p-4" style="background-color: #4658fb;">
-        <div class="container mx-auto flex justify-between items-center">
-            <a href="/" class="text-2xl font-bold">blog</a>
-            <ul class="flex space-x-4">
-                <li><a href="{{ url_for('main.home') }}" class="hover:underline">Home</a></li>
-                <li><a href="{{ url_for('blog.index') }}" class="hover:underline">Blog</a></li>
-                <li><a href="{{ url_for('main.about') }}" class="hover:underline">About</a></li>
-                <li><a href="{{ url_for('main.contact') }}" class="hover:underline">Contact</a></li>
-                {% if current_user.is_authenticated %}
-                    <li><a href="{{ url_for('auth.logout') }}" class="hover:underline">Logout</a></li>
-                    {% if current_user.is_authenticated and current_user.is_administrator() %}
-        <li><a href="{{ url_for('admin.admin_dashboard') }}" class="hover:underline">Admin</a></li>
-    {% endif %}
-                {% else %}
-                    <li><a href="{{ url_for('auth.login') }}" class="hover:underline">Login</a></li>
-                    <li><a href="{{ url_for('auth.register') }}" class="hover:underline">Register</a></li>
-                {% endif %}
-            </ul>
+<html lang="en" class="h-full dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CodeVault{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'neon': {
+                            purple: '#b624ff',
+                            blue: '#2196f3',
+                            pink: '#ff0080',
+                            green: '#00ff9f'
+                        },
+                        'cyber': {
+                            dark: '#0a0a0f',
+                            darker: '#050507',
+                            light: '#1a1a2f'
+                        }
+                    },
+                    animation: {
+                        'gradient-x': 'gradient-x 15s ease infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate'
+                    },
+                    keyframes: {
+                        'gradient-x': {
+                            '0%, 100%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'left center'
+                            },
+                            '50%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'right center'
+                            }
+                        },
+                        'glow': {
+                            '0%': { 'box-shadow': '0 0 5px #2196f3, 0 0 10px #2196f3, 0 0 15px #2196f3' },
+                            '100%': { 'box-shadow': '0 0 20px #2196f3, 0 0 30px #2196f3, 0 0 40px #2196f3' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .cyber-grid {
+            background-image: linear-gradient(rgba(33, 150, 243, 0.1) 1px, transparent 1px),
+                            linear-gradient(90deg, rgba(33, 150, 243, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .nav-item {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background: linear-gradient(90deg, #2196f3, #b624ff);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item:hover::before {
+            transform: translateX(0);
+        }
+
+        .gradient-border {
+            position: relative;
+            background: #0a0a0f;
+            padding: 3px;
+        }
+
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: inherit;
+            padding: 2px;
+            background: linear-gradient(45deg, #2196f3, #b624ff);
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {% block head %}{% endblock %}
+</head>
+<body class="flex flex-col min-h-full bg-cyber-dark text-gray-100">
+    <!-- Animated Background Grid -->
+    <div class="cyber-grid fixed inset-0 z-0 opacity-20"></div>
+
+    <!-- Navigation -->
+    <nav class="relative z-10 bg-cyber-darker/80 backdrop-blur-md border-b border-neon-blue/20">
+        <div class="container mx-auto px-6">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <a href="/" class="flex items-center space-x-2">
+                    <span class="text-2xl font-bold bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
+                        CodeVault
+                    </span>
+                </a>
+
+                <!-- Navigation Items -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="{{ url_for('main.home') }}" class="nav-item text-gray-300 hover:text-white transition-colors">Home</a>
+                    <a href="{{ url_for('blog.index') }}" class="nav-item text-gray-300 hover:text-white transition-colors">Blog</a>
+                    <a href="{{ url_for('main.about') }}" class="nav-item text-gray-300 hover:text-white transition-colors">About</a>
+                    <a href="{{ url_for('main.contact') }}" class="nav-item text-gray-300 hover:text-white transition-colors">Contact</a>
+                    
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.is_administrator() %}
+                        <a href="{{ url_for('admin.admin_dashboard') }}" 
+                           class="gradient-border rounded-lg">
+                            <span class="px-4 py-2 inline-block text-neon-blue hover:text-neon-purple transition-colors">
+                                Admin
+                            </span>
+                        </a>
+                        {% endif %}
+                        <a href="{{ url_for('auth.logout') }}" 
+                           class="px-4 py-2 text-gray-300 hover:text-white transition-colors">
+                            Logout
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" 
+                           class="gradient-border rounded-lg">
+                            <span class="px-4 py-2 inline-block text-neon-blue hover:text-neon-purple transition-colors">
+                                Login
+                            </span>
+                        </a>
+                    {% endif %}
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden text-gray-300 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
         </div>
     </nav>
 
-    <main class="flex-grow">
+    <!-- Main Content -->
+    <main class="relative z-10 flex-grow container mx-auto px-6 py-8">
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="text-white p-4" style="background-color: #4658fb;">
-        <div class="container mx-auto text-center">
-            <p>&copy; 2023 blog. All rights reserved.</p>
+    <!-- Footer -->
+    <footer class="relative z-10 bg-cyber-darker/80 backdrop-blur-md border-t border-neon-blue/20">
+        <div class="container mx-auto px-6 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <!-- Brand Section -->
+                <div>
+                    <h3 class="text-xl font-bold bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent mb-4">
+                        CodeVault
+                    </h3>
+                    <p class="text-gray-400">
+                        Exploring the frontiers of technology through in-depth articles, tutorials, and insights.
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="text-lg font-semibold text-white mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="#" class="text-gray-400 hover:text-neon-blue transition-colors">Latest Articles</a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-gray-400 hover:text-neon-blue transition-colors">Tutorials</a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-gray-400 hover:text-neon-blue transition-colors">Resources</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Social Links -->
+                <div>
+                    <h3 class="text-lg font-semibold text-white mb-4">Connect</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 rounded-full border border-neon-blue/30 flex items-center justify-center text-gray-400 hover:text-neon-blue hover:border-neon-blue transition-colors">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full border border-neon-blue/30 flex items-center justify-center text-gray-400 hover:text-neon-blue hover:border-neon-blue transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full border border-neon-blue/30 flex items-center justify-center text-gray-400 hover:text-neon-blue hover:border-neon-blue transition-colors">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="mt-8 pt-8 border-t border-neon-blue/20 text-center text-gray-400">
+                <p>&copy; 2024 CodeVault. All rights reserved.</p>
+            </div>
         </div>
     </footer>
 </body>

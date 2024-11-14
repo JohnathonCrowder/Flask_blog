@@ -4,6 +4,8 @@ from sqlalchemy import func
 
 main = Blueprint('main', __name__)
 
+
+
 @main.route('/')
 def home():
     # Featured section

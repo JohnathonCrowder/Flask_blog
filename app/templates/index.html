@@ -1,136 +1,331 @@
 {% extends "base.html" %}
 
-{% block title %}Welcome to {{ company_name }}{% endblock %}
+{% block title %}CodeVault - Programming & Tech Blog{% endblock %}
+
+{% block head %}
+<style>
+    .code-background {
+        background: 
+            radial-gradient(circle at 50% 50%, rgba(33, 150, 243, 0.1), transparent 50%),
+            radial-gradient(circle at 0% 0%, rgba(182, 36, 255, 0.1), transparent 50%);
+    }
+
+    @keyframes fadeUp {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade-up {
+        animation: fadeUp 0.6s ease forwards;
+    }
+
+    .code-line {
+        font-family: 'Consolas', monospace;
+        opacity: 0;
+    }
+
+    .code-line:nth-child(1) { animation: fadeUp 0.6s ease forwards 0.2s; }
+    .code-line:nth-child(2) { animation: fadeUp 0.6s ease forwards 0.4s; }
+    .code-line:nth-child(3) { animation: fadeUp 0.6s ease forwards 0.6s; }
+    .code-line:nth-child(4) { animation: fadeUp 0.6s ease forwards 0.8s; }
+
+    .glitch {
+        position: relative;
+        text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff,
+                     0.025em 0.04em 0 #fffc00;
+        animation: glitch 725ms infinite;
+    }
+
+    .glitch span {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .glitch span:first-child {
+        animation: glitch 500ms infinite;
+        clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+        transform: translate(-0.04em, -0.03em);
+        opacity: 0.75;
+    }
+
+    .glitch span:last-child {
+        animation: glitch 375ms infinite;
+        clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+        transform: translate(0.04em, 0.03em);
+        opacity: 0.75;
+    }
+
+    @keyframes glitch {
+        0% { text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff,
+                     0.025em 0.04em 0 #fffc00; }
+        15% { text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff,
+                     0.025em 0.04em 0 #fffc00; }
+        16% { text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.035em 0 #fc00ff,
+                     -0.05em -0.05em 0 #fffc00; }
+        49% { text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.035em 0 #fc00ff,
+                     -0.05em -0.05em 0 #fffc00; }
+        50% { text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff,
+                     0 -0.04em 0 #fffc00; }
+        99% { text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff,
+                     0 -0.04em 0 #fffc00; }
+        100% { text-shadow: -0.05em 0 0 #00fffc, -0.025em -0.04em 0 #fc00ff,
+                     -0.04em -0.025em 0 #fffc00; }
+    }
+
+    .card-hover {
+        transition: all 0.3s ease;
+    }
+
+    .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0 20px rgba(33, 150, 243, 0.3);
+    }
+
+    /* Terminal Effect */
+    .terminal {
+        background: rgba(15, 15, 20, 0.95);
+        border: 1px solid rgba(33, 150, 243, 0.2);
+        border-radius: 10px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .terminal::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 25px;
+        background: rgba(33, 150, 243, 0.1);
+        border-bottom: 1px solid rgba(33, 150, 243, 0.2);
+    }
+
+    .terminal::after {
+        content: '● ● ●';
+        position: absolute;
+        top: 4px;
+        left: 10px;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.4);
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="bg-gray-50 min-h-screen py-12">
-    <div class="container mx-auto px-4 max-w-6xl">
-        <!-- Header Section -->
-        <div class="text-center mb-12">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4" style="color: #4658fb;">Welcome to Our Blog</h1>
-            <p class="text-gray-600 text-lg mb-8">Insights, updates, and stories from our team</p>
-            {% if current_user.is_authenticated %}
-            <a href="{{ url_for('blog.create') }}" 
-               class="inline-flex items-center px-6 py-3 rounded-lg text-white transition-all duration-300 hover:shadow-lg"
-               style="background-color: #4658fb;">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                Create New Post
-            </a>
-            {% endif %}
-        </div>
-
-        <!-- Featured Posts Section -->
-        {% if featured_posts %}
-        <div class="mb-12">
-            <h2 class="text-2xl font-bold mb-6" style="color: #4658fb;">Featured Posts</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {% for post in featured_posts %}
-                <article class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                    {% if post.featured_image_data %}
-                    <img src="{{ url_for('blog.serve_image', post_id=post.id) }}" 
-                         alt="{{ post.title }}" 
-                         class="w-full h-48 object-cover">
-                    {% else %}
-                    <div class="h-48 bg-gradient-to-r from-blue-500 to-purple-500"></div>
-                    {% endif %}
-                    
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-3 hover:text-blue-600 transition-colors duration-300">
-                            <a href="{{ url_for('blog.post', post_id=post.id) }}">{{ post.title }}</a>
-                        </h3>
-                        <p class="text-gray-600 mb-4 line-clamp-2">{{ post.subtitle or post.content|striptags|truncate(100) }}</p>
-                        <a href="{{ url_for('blog.post', post_id=post.id) }}" 
-                           class="inline-flex items-center text-sm font-medium"
-                           style="color: #4658fb;">
-                            Read more
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                    </div>
-                </article>
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- Recent Posts Section -->
-        {% if recent_posts %}
-        <div class="mb-12">
-            <h2 class="text-2xl font-bold mb-6" style="color: #4658fb;">Recent Posts</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {% for post in recent_posts %}
-                <article class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                    {% if post.featured_image_data %}
-                    <img src="{{ url_for('blog.serve_image', post_id=post.id) }}" 
-                         alt="{{ post.title }}" 
-                         class="w-full h-48 object-cover">
-                    {% else %}
-                    <div class="h-48 bg-gradient-to-r from-blue-500 to-purple-500"></div>
-                    {% endif %}
-                    
-                    <div class="p-6">
-                        <div class="flex items-center mb-4">
-                            <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                <span class="text-gray-600 font-semibold">{{ post.author.username[0].upper() }}</span>
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm font-medium text-gray-900">
-                                    <a href="{{ url_for('blog.author_profile', user_id=post.author.id) }}" class="hover:text-blue-600">
-                                        {{ post.author.username }}
-                                    </a>
-                                </p>
-                                <p class="text-sm text-gray-500">{{ post.created_at.strftime('%B %d, %Y') }}</p>
-                            </div>
-                        </div>
-                        
-                        <h3 class="text-xl font-bold mb-3 hover:text-blue-600 transition-colors duration-300">
-                            <a href="{{ url_for('blog.post', post_id=post.id) }}">{{ post.title }}</a>
-                        </h3>
-                        <p class="text-gray-600 mb-4 line-clamp-2">{{ post.subtitle or post.content|striptags|truncate(100) }}</p>
-                        
-                        <a href="{{ url_for('blog.post', post_id=post.id) }}" 
-                           class="inline-flex items-center text-sm font-medium"
-                           style="color: #4658fb;">
-                            Read more
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                    </div>
-                </article>
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- Featured Authors Section -->
-        {% if featured_authors %}
-        <div>
-            <h2 class="text-2xl font-bold mb-6" style="color: #4658fb;">Featured Authors</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {% for author in featured_authors %}
-                <div class="bg-white rounded-xl shadow-md p-6 text-center">
-                    <div class="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-4">
-                        <span class="text-2xl font-bold text-gray-600">{{ author.username[0].upper() }}</span>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">{{ author.username }}</h3>
-                    <p class="text-gray-600 mb-4">{{ author.posts|length }} posts</p>
-                    <a href="{{ url_for('blog.author_profile', user_id=author.id) }}" 
-                       class="inline-flex items-center text-sm font-medium"
-                       style="color: #4658fb;">
-                        View Profile
-                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
+<!-- Hero Section -->
+<section class="code-background -mt-8 py-20 px-4 relative overflow-hidden">
+    <div class="absolute inset-0 bg-cyber-dark/80"></div>
+    
+    <div class="container mx-auto max-w-6xl relative">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <!-- Hero Content -->
+            <div class="space-y-8">
+                <h1 class="text-5xl md:text-6xl font-bold glitch">
+                    <span aria-hidden="true">Explore_The_Code</span>
+                    Explore_The_Code
+                    <span aria-hidden="true">Explore_The_Code</span>
+                </h1>
+                
+                <p class="text-xl text-gray-300 code-line">
+                    > Discover the future of technology
+                </p>
+                
+                <div class="flex flex-wrap gap-4 code-line">
+                    <a href="{{ url_for('blog.index') }}" 
+                       class="gradient-border rounded-lg inline-block">
+                        <span class="px-6 py-3 inline-block text-neon-blue hover:text-neon-purple transition-colors">
+                            <i class="fas fa-code mr-2"></i>Start Reading
+                        </span>
+                    </a>
+                    <a href="#featured" 
+                       class="px-6 py-3 border border-neon-blue/30 rounded-lg text-gray-300 hover:text-white hover:border-neon-blue transition-all">
+                        <i class="fas fa-arrow-down mr-2"></i>Latest Posts
                     </a>
                 </div>
-                {% endfor %}
+
+                <div class="flex gap-4 text-sm text-gray-400 code-line">
+                    <div class="flex items-center">
+                        <i class="fas fa-users mr-2 text-neon-blue"></i>
+                        <span>{{ total_users if total_users else '1000' }}+ Members</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-file-code mr-2 text-neon-purple"></i>
+                        <span>{{ total_posts if total_posts else '500' }}+ Articles</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terminal Visual -->
+            <div class="terminal p-8 pt-12 hidden lg:block">
+                <div class="space-y-3 font-mono text-sm">
+                    <p class="text-neon-blue code-line">
+                        > initializing CodeVault environment...
+                    </p>
+                    <p class="text-gray-400 code-line">
+                        > loading latest tech articles...
+                    </p>
+                    <p class="text-neon-green code-line">
+                        > connecting to development community...
+                    </p>
+                    <p class="text-neon-purple code-line">
+                        > system ready. Welcome to CodeVault_
+                    </p>
+                    <div class="code-line">
+                        <div class="h-4 w-20 bg-neon-blue/20 animate-pulse rounded"></div>
+                    </div>
+                </div>
             </div>
         </div>
-        {% endif %}
     </div>
-</div>
+
+    <!-- Floating Elements -->
+    <div class="absolute top-1/4 left-10 w-20 h-20 border border-neon-blue/20 rounded-lg transform rotate-45 animate-pulse"></div>
+    <div class="absolute bottom-1/4 right-10 w-16 h-16 border border-neon-purple/20 rounded-full animate-pulse"></div>
+    <div class="absolute top-1/2 right-1/4 w-12 h-12 border border-neon-green/20 rounded-lg transform -rotate-12 animate-pulse"></div>
+</section>
+
+<!-- Featured Posts Section -->
+<section id="featured" class="py-20">
+    <div class="container mx-auto px-6">
+        <h2 class="text-3xl md:text-4xl font-bold mb-12 text-center 
+                   bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
+            Featured Articles
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {% for post in featured_posts %}
+            <article class="bg-cyber-light rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 animated-border">
+                {% if post.featured_image_data %}
+                <img src="{{ url_for('blog.serve_image', post_id=post.id) }}" 
+                     alt="{{ post.title }}" 
+                     class="w-full h-48 object-cover">
+                {% else %}
+                <div class="w-full h-48 bg-gradient-to-r from-neon-blue to-neon-purple"></div>
+                {% endif %}
+                
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="h-10 w-10 rounded-full bg-neon-blue/20 flex items-center justify-center mr-3">
+                            <span class="text-neon-blue font-semibold">{{ post.author.username[0].upper() }}</span>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-300">{{ post.author.username }}</p>
+                            <p class="text-xs text-gray-400">{{ post.created_at.strftime('%B %d, %Y') }}</p>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-2xl font-bold mb-3">
+                        <a href="{{ url_for('blog.post', post_id=post.id) }}" 
+                           class="text-white hover:text-neon-blue transition-colors">
+                            {{ post.title }}
+                        </a>
+                    </h3>
+                    
+                    <p class="text-gray-400 mb-4 line-clamp-3">
+                        {{ post.subtitle or post.content|striptags|truncate(150) }}
+                    </p>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex space-x-2">
+                            {% for tag in post.tag_list[:3] %}
+                            <span class="px-2 py-1 text-xs font-medium bg-neon-blue/10 text-neon-blue rounded-full">
+                                {{ tag }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                        <a href="{{ url_for('blog.post', post_id=post.id) }}" 
+                           class="text-neon-blue hover:text-neon-purple transition-colors">
+                            Read more &rarr;
+                        </a>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-12">
+            <a href="{{ url_for('blog.index') }}" 
+               class="animated-border rounded-lg">
+                <span class="px-8 py-3 inline-block bg-cyber-dark font-semibold text-white">
+                    View All Articles
+                </span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="py-20 bg-cyber-light/50">
+    <div class="container mx-auto px-6">
+        <h2 class="text-3xl md:text-4xl font-bold mb-12 text-center 
+                   bg-gradient-to-r from-neon-green to-neon-blue bg-clip-text text-transparent">
+            Explore by Category
+        </h2>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {% set categories = ['Web Development', 'Machine Learning', 'DevOps', 'Cybersecurity'] %}
+            {% set icons = ['laptop-code', 'brain', 'cloud', 'shield-alt'] %}
+            {% for category in categories %}
+            <a href="#" class="group p-6 bg-cyber-darker rounded-lg border border-neon-blue/20 hover:border-neon-blue transition-colors duration-300">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-{{ icons[loop.index0] }} text-4xl text-neon-blue group-hover:text-neon-purple transition-colors"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-white mb-2">{{ category }}</h3>
+                <p class="text-gray-400">Explore our latest {{ category|lower }} articles and tutorials.</p>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-20">
+    <div class="container mx-auto px-6">
+        <div class="bg-gradient-to-r from-neon-purple to-neon-blue p-1 rounded-xl">
+            <div class="bg-cyber-dark p-12 rounded-xl text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-6 text-white">
+                    Ready to Level Up Your Skills?
+                </h2>
+                <p class="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
+                    Join our community of tech enthusiasts and get the latest articles, tutorials, and industry news delivered straight to your inbox.
+                </p>
+                <form class="flex justify-center">
+                    <input type="email" 
+                           placeholder="Enter your email" 
+                           class="px-6 py-3 rounded-l-lg bg-cyber-light text-white focus:outline-none focus:ring-2 focus:ring-neon-blue w-full max-w-md">
+                    <button type="submit" 
+                            class="px-8 py-3 bg-neon-blue text-cyber-dark font-semibold rounded-r-lg hover:bg-neon-purple transition-colors duration-300">
+                        Subscribe
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Add animation classes for floating icons
+    const animationStyles = document.createElement('style');
+    for (let i = 1; i <= 10; i++) {
+        animationStyles.textContent += `
+            @keyframes float-${i} {
+                0% {
+                    transform: translate(0, 0);
+                }
+                50% {
+                    transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px);
+                }
+                100% {
+                    transform: translate(0, 0);
+                }
+            }
+            .animate-float-${i} {
+                animation: float-${i} ${10 + Math.random() * 10}s ease-in-out infinite;
+            }
+        `;
+    }
+    document.head.appendChild(animationStyles);
+</script>
 {% endblock %}
