@@ -1,13 +1,24 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, abort
+from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, abort, send_file
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
-import os
+import io
 from .models import db, Post, User
+from sqlalchemy import or_
 
 blog = Blueprint('blog', __name__)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
+
+@blog.route('/blog/image/<int:post_id>')
+def serve_image(post_id):
+    post = Post.query.get_or_404(post_id)
+    if not post.featured_image_data:
+        abort(404)
+    return send_file(
+        io.BytesIO(post.featured_image_data),
+        mimetype=post.featured_image_mimetype
+    )
 
 @blog.route('/blog')
 def index():
@@ -31,20 +42,6 @@ def create():
         tags = request.form.get('tags')
         status = request.form.get('status', 'draft')
         
-        # Handle image upload
-        featured_image = None
-        if 'featured_image' in request.files:
-            file = request.files['featured_image']
-            if file and file.filename and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                # Ensure upload directory exists
-                upload_dir = os.path.join(current_app.root_path, 'static', 'uploads')
-                os.makedirs(upload_dir, exist_ok=True)
-                # Save the file
-                filepath = os.path.join(upload_dir, filename)
-                file.save(filepath)
-                featured_image = f'uploads/{filename}'
-
         post = Post(
             title=title,
             subtitle=subtitle,
@@ -52,9 +49,19 @@ def create():
             category=category,
             tags=tags,
             status=status,
-            featured_image=featured_image,
             author=current_user
         )
+        
+        # Handle image upload
+        if 'featured_image' in request.files:
+            file = request.files['featured_image']
+            if file and file.filename and allowed_file(file.filename):
+                # Read the file data and mime type
+                image_data = file.read()
+                mimetype = file.content_type
+                
+                post.featured_image_data = image_data
+                post.featured_image_mimetype = mimetype
         
         db.session.add(post)
         db.session.commit()
@@ -84,17 +91,12 @@ def edit(post_id):
         if 'featured_image' in request.files:
             file = request.files['featured_image']
             if file and file.filename and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                upload_dir = os.path.join(current_app.root_path, 'static', 'uploads')
-                os.makedirs(upload_dir, exist_ok=True)
-                filepath = os.path.join(upload_dir, filename)
-                file.save(filepath)
-                # Delete old image if it exists
-                if post.featured_image:
-                    old_filepath = os.path.join(current_app.root_path, 'static', post.featured_image)
-                    if os.path.exists(old_filepath):
-                        os.remove(old_filepath)
-                post.featured_image = f'uploads/{filename}'
+                # Read the file data and mime type
+                image_data = file.read()
+                mimetype = file.content_type
+                
+                post.featured_image_data = image_data
+                post.featured_image_mimetype = mimetype
         
         db.session.commit()
         flash('Post updated successfully!', 'success')
@@ -108,12 +110,6 @@ def delete(post_id):
     post = Post.query.get_or_404(post_id)
     if post.author != current_user and not current_user.is_administrator():
         abort(403)
-    
-    # Delete featured image if it exists
-    if post.featured_image:
-        filepath = os.path.join(current_app.root_path, 'static', post.featured_image)
-        if os.path.exists(filepath):
-            os.remove(filepath)
     
     db.session.delete(post)
     db.session.commit()

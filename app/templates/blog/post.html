@@ -8,8 +8,8 @@
         <!-- Post Header -->
         <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
             <!-- Featured Image -->
-            {% if post.featured_image %}
-            <img src="{{ url_for('static', filename=post.featured_image) }}" 
+            {% if post.featured_image_data %}
+            <img src="{{ url_for('blog.serve_image', post_id=post.id) }}" 
                  alt="{{ post.title }}" 
                  class="w-full h-64 object-cover">
             {% else %}
@@ -49,6 +49,20 @@
                     </div>
                 </div>
 
+                <!-- Status Badge (if user is author or admin) -->
+                {% if current_user.is_authenticated and (current_user.id == post.author.id or current_user.is_administrator()) %}
+                <div class="mb-6">
+                    <span class="px-3 py-1 text-sm font-semibold rounded-full 
+                        {% if post.status == 'published' %}
+                            bg-green-100 text-green-800
+                        {% else %}
+                            bg-yellow-100 text-yellow-800
+                        {% endif %}">
+                        {{ post.status.capitalize() }}
+                    </span>
+                </div>
+                {% endif %}
+
                 <!-- Post Content -->
                 <div class="prose prose-lg max-w-none">
                     {{ post.content|safe }}
@@ -67,6 +81,11 @@
                     </div>
                 </div>
                 {% endif %}
+
+                <!-- Metadata -->
+                <div class="mt-8 text-sm text-gray-500">
+                    <p>Last updated: {{ post.updated_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                </div>
             </div>
         </div>
 

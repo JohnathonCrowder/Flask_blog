@@ -36,6 +36,8 @@ class Post(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     status = db.Column(db.String(20), default='draft')
+    featured_image_data = db.Column(db.LargeBinary)  # For storing the actual image data
+    featured_image_mimetype = db.Column(db.String(32))  # For storing the image type
 
     @property
     def tag_list(self):
