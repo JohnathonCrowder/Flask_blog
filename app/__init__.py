@@ -3,6 +3,10 @@ from flask_login import LoginManager
 from flask_migrate import Migrate
 from .models import db, User
 from config import Config
+from .admin import admin
+from . import commands
+
+
 
 
 
@@ -32,7 +36,9 @@ def create_app():
     app.register_blueprint(main)
     app.register_blueprint(auth)
     app.register_blueprint(blog)
+    app.register_blueprint(admin)
 
+    commands.init_app(app)
 
 
     return app

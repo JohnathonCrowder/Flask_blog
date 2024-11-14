@@ -19,6 +19,9 @@
                 <li><a href="{{ url_for('main.contact') }}" class="hover:underline">Contact</a></li>
                 {% if current_user.is_authenticated %}
                     <li><a href="{{ url_for('auth.logout') }}" class="hover:underline">Logout</a></li>
+                    {% if current_user.is_authenticated and current_user.is_administrator() %}
+        <li><a href="{{ url_for('admin.admin_dashboard') }}" class="hover:underline">Admin</a></li>
+    {% endif %}
                 {% else %}
                     <li><a href="{{ url_for('auth.login') }}" class="hover:underline">Login</a></li>
                     <li><a href="{{ url_for('auth.register') }}" class="hover:underline">Register</a></li>
