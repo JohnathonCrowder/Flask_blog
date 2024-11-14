@@ -106,7 +106,7 @@
             </svg>
             Back to Blog
         </a>
-
+    
         {% if current_user.is_authenticated and current_user.is_administrator() %}
         <div class="flex space-x-4">
             <a href="{{ url_for('blog.edit', post_id=post.id) }}" 

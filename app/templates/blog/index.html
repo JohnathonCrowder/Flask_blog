@@ -9,7 +9,7 @@
         <div class="text-center mb-12">
             <h1 class="text-4xl md:text-5xl font-bold mb-4" style="color: #4658fb;">Our Blog</h1>
             <p class="text-gray-600 text-lg mb-8">Insights, updates, and stories from our team</p>
-            {% if current_user.is_authenticated %}
+            {% if current_user.is_authenticated and current_user.is_administrator() %}
             <a href="{{ url_for('blog.create') }}" 
                class="inline-flex items-center px-6 py-3 rounded-lg text-white transition-all duration-300 hover:shadow-lg"
                style="background-color: #4658fb;">
