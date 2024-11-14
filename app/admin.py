@@ -5,6 +5,8 @@ from functools import wraps
 from datetime import datetime, timedelta
 from flask import request, url_for
 from sqlalchemy import or_
+from datetime import datetime, timedelta
+
 
 
 admin = Blueprint('admin', __name__)
@@ -48,7 +50,11 @@ def admin_dashboard():
 @admin_required
 def manage_users():
     users = User.query.all()
-    return render_template('admin/users.html', users=users)
+    now = datetime.utcnow()
+    return render_template('admin/users.html', 
+                          users=users,
+                          now=now,
+                          timedelta=timedelta)
 
 @admin.route('/admin/posts')
 @login_required
