@@ -1,12 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Create New Post - {{ company_name }}{% endblock %}
+{% block title %}{{ title|default('Create New Post') }} - {{ company_name }}{% endblock %}
 
 {% block head %}
 {{ super() }}
-<!-- Add Quill CSS -->
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-<!-- Add Quill JS -->
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 {% endblock %}
 
@@ -15,7 +13,7 @@
     <div class="container mx-auto px-4 max-w-5xl">
         <div class="bg-white rounded-xl shadow-md overflow-hidden">
             <div class="p-8">
-                <h1 class="text-3xl font-bold mb-8">Create New Post</h1>
+                <h1 class="text-3xl font-bold mb-8">{{ title|default('Create New Post') }}</h1>
                 
                 <form method="POST" class="space-y-6" enctype="multipart/form-data" id="postForm">
                     <!-- Title Section -->
@@ -27,6 +25,7 @@
                                name="title" 
                                required
                                placeholder="Enter your post title"
+                               value="{{ post.title if post else '' }}"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     
@@ -38,6 +37,7 @@
                         <input type="text" 
                                name="subtitle" 
                                placeholder="Enter a subtitle or brief description"
+                               value="{{ post.subtitle if post else '' }}"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
@@ -48,6 +48,12 @@
                         </label>
                         <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
                             <div class="space-y-1 text-center">
+                                {% if post and post.featured_image_data %}
+                                    <img src="{{ url_for('blog.serve_image', post_id=post.id) }}" 
+                                         alt="Current featured image" 
+                                         class="mx-auto h-32 w-auto mb-4">
+                                    <p class="text-sm text-gray-500 mb-4">Current image shown above. Upload a new one to replace it:</p>
+                                {% endif %}
                                 <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
                                     <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
@@ -73,12 +79,12 @@
                         <select name="category" 
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Select a category</option>
-                            <option value="Technology">Technology</option>
-                            <option value="Programming">Programming</option>
-                            <option value="Design">Design</option>
-                            <option value="Business">Business</option>
-                            <option value="Tutorial">Tutorial</option>
-                            <option value="News">News</option>
+                            {% set categories = ['Technology', 'Programming', 'Design', 'Business', 'Tutorial', 'News'] %}
+                            {% for category in categories %}
+                                <option value="{{ category }}" {% if post and post.category == category %}selected{% endif %}>
+                                    {{ category }}
+                                </option>
+                            {% endfor %}
                         </select>
                     </div>
 
@@ -90,6 +96,7 @@
                         <input type="text" 
                                name="tags" 
                                placeholder="Enter tags separated by commas (e.g., python, flask, web development)"
+                               value="{{ post.tags if post else '' }}"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     
@@ -109,25 +116,20 @@
                         </label>
                         <div class="flex space-x-4">
                             <label class="inline-flex items-center">
-                                <input type="radio" name="status" value="draft" checked class="form-radio text-blue-600">
+                                <input type="radio" name="status" value="draft" 
+                                       {% if not post or post.status == 'draft' %}checked{% endif %}
+                                       class="form-radio text-blue-600">
                                 <span class="ml-2">Draft</span>
                             </label>
                             <label class="inline-flex items-center">
-                                <input type="radio" name="status" value="published" class="form-radio text-blue-600">
+                                <input type="radio" name="status" value="published"
+                                       {% if post and post.status == 'published' %}checked{% endif %}
+                                       class="form-radio text-blue-600">
                                 <span class="ml-2">Published</span>
                             </label>
                         </div>
                     </div>
                     
-                    <!-- Preview Section -->
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <h3 class="text-sm font-medium text-gray-700 mb-2">SEO Preview</h3>
-                        <div class="preview-container border border-gray-200 p-4 rounded">
-                            <p class="text-xl font-bold preview-title"></p>
-                            <p class="text-gray-600 preview-subtitle"></p>
-                        </div>
-                    </div>
-
                     <!-- Action Buttons -->
                     <div class="flex justify-end space-x-4">
                         <a href="{{ url_for('blog.index') }}" 
@@ -138,7 +140,7 @@
                                 class="px-6 py-3 rounded-lg text-white transition-colors duration-300"
                                 style="background-color: #4658fb;"
                                 onclick="submitForm(event)">
-                            Publish Post
+                            {{ 'Update Post' if is_edit else 'Publish Post' }}
                         </button>
                     </div>
                 </form>
@@ -167,6 +169,11 @@
         }
     });
 
+    {% if post and post.content %}
+        // If editing, set the editor content
+        quill.root.innerHTML = {{ post.content|tojson|safe }};
+    {% endif %}
+
     // Form submission
     function submitForm(e) {
         e.preventDefault();
@@ -177,34 +184,5 @@
         // Submit the form
         document.getElementById('postForm').submit();
     }
-
-    // Live preview functionality
-    document.querySelector('input[name="title"]').addEventListener('input', function(e) {
-        document.querySelector('.preview-title').textContent = e.target.value;
-    });
-    
-    document.querySelector('input[name="subtitle"]').addEventListener('input', function(e) {
-        document.querySelector('.preview-subtitle').textContent = e.target.value;
-    });
-
-    // Image upload preview
-    document.querySelector('input[name="featured_image"]').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const preview = document.createElement('img');
-                preview.src = e.target.result;
-                preview.className = 'mt-2 rounded-lg w-full max-h-48 object-cover';
-                const container = document.querySelector('.space-y-1');
-                const existingPreview = container.querySelector('img');
-                if (existingPreview) {
-                    container.removeChild(existingPreview);
-                }
-                container.appendChild(preview);
-            }
-            reader.readAsDataURL(file);
-        }
-    });
 </script>
 {% endblock %}
