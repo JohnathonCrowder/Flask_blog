@@ -1,152 +1,248 @@
 {% extends "base.html" %}
 
-{% block title %}Contact - {{ site_settings.site_name if site_settings else 'Our Blog' }}{% endblock %}
+{% block title %}Contact - CodeVault{% endblock %}
+
+{% block head %}
+<style>
+    .contact-grid {
+        background: 
+            linear-gradient(to right, rgba(33, 150, 243, 0.05) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(33, 150, 243, 0.05) 1px, transparent 1px);
+        background-size: 24px 24px;
+    }
+
+    .glow-input {
+        transition: all 0.3s ease;
+    }
+
+    .glow-input:focus {
+        box-shadow: 0 0 15px rgba(33, 150, 243, 0.3);
+        border-color: #2196f3;
+    }
+
+    .contact-card {
+        transition: all 0.3s ease;
+        background: linear-gradient(145deg, rgba(33, 150, 243, 0.05), rgba(182, 36, 255, 0.05));
+    }
+
+    .contact-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0 30px rgba(33, 150, 243, 0.15);
+    }
+
+    .pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: .5;
+        }
+    }
+
+    .circuit-lines {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            radial-gradient(circle at 100% 100%, rgba(33, 150, 243, 0.1) 0, transparent 50px),
+            radial-gradient(circle at 0% 0%, rgba(182, 36, 255, 0.1) 0, transparent 50px);
+    }
+
+    .status-indicator {
+        position: relative;
+        padding-left: 1.5rem;
+    }
+
+    .status-indicator::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0.75rem;
+        height: 0.75rem;
+        border-radius: 50%;
+        background-color: #00ff9f;
+        animation: pulse 2s infinite;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="bg-gray-50 min-h-screen py-12">
-    <div class="container mx-auto px-4 max-w-6xl">
+<!-- Hero Section -->
+<section class="contact-grid -mt-8 py-20 px-4 relative overflow-hidden">
+    <div class="circuit-lines"></div>
+    <div class="container mx-auto max-w-6xl relative">
         <div class="text-center mb-12">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4" style="color: #4658fb;">Contact Us</h1>
-            {% if site_settings and site_settings.site_description %}
-            <p class="text-xl text-gray-600">{{ site_settings.site_description }}</p>
-            {% endif %}
+            <h1 class="text-4xl md:text-6xl font-bold mb-6">
+                <span class="bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink bg-clip-text text-transparent">
+                    Connect With Us
+                </span>
+            </h1>
+            <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+                Have questions? We're here to help. Reach out to our team for support, feedback, or collaboration opportunities.
+            </p>
         </div>
+    </div>
+</section>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <!-- Contact Form -->
-            <div class="bg-white rounded-xl shadow-md p-8">
-                <h2 class="text-2xl font-bold mb-6" style="color: #4658fb;">Send us a message</h2>
-                <form action="#" method="POST" class="space-y-6">
-                    <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                        <input type="text" 
-                               name="name" 
-                               id="name" 
-                               required 
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+<!-- Main Content -->
+<section class="py-12">
+    <div class="container mx-auto max-w-6xl px-4">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Contact Information -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Status Card -->
+                <div class="contact-card rounded-xl border border-neon-blue/20 p-6">
+                    <h3 class="text-xl font-bold text-white mb-4">System Status</h3>
+                    <div class="space-y-3">
+                        <div class="status-indicator text-gray-300">
+                            Support Team Online
+                        </div>
+                        <div class="text-sm text-gray-400">
+                            Average Response Time: ~2 hours
+                        </div>
                     </div>
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input type="email" 
-                               name="email" 
-                               id="email" 
-                               required 
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <!-- Quick Contact Methods -->
+                <div class="contact-card rounded-xl border border-neon-blue/20 p-6">
+                    <h3 class="text-xl font-bold text-white mb-4">Quick Connect</h3>
+                    <div class="space-y-4">
+                        <a href="mailto:{{ site_settings.contact_email if site_settings else 'contact@codevault.com' }}" 
+                           class="flex items-center text-gray-300 hover:text-neon-blue transition-colors">
+                            <i class="fas fa-envelope w-8"></i>
+                            <span>{{ site_settings.contact_email if site_settings else 'contact@codevault.com' }}</span>
+                        </a>
+                        <div class="flex items-center text-gray-300">
+                            <i class="fas fa-clock w-8"></i>
+                            <span>24/7 Support</span>
+                        </div>
+                        <div class="flex items-center text-gray-300">
+                            <i class="fas fa-location-dot w-8"></i>
+                            <span>Global Team</span>
+                        </div>
                     </div>
-                    <div>
-                        <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
-                        <input type="text" 
-                               name="subject" 
-                               id="subject" 
-                               required 
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <!-- Social Links -->
+                <div class="contact-card rounded-xl border border-neon-blue/20 p-6">
+                    <h3 class="text-xl font-bold text-white mb-4">Connect on Social</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <a href="#" class="flex items-center justify-center p-3 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue transition-all">
+                            <i class="fab fa-github mr-2"></i>
+                            GitHub
+                        </a>
+                        <a href="#" class="flex items-center justify-center p-3 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue transition-all">
+                            <i class="fab fa-twitter mr-2"></i>
+                            Twitter
+                        </a>
+                        <a href="#" class="flex items-center justify-center p-3 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue transition-all">
+                            <i class="fab fa-discord mr-2"></i>
+                            Discord
+                        </a>
+                        <a href="#" class="flex items-center justify-center p-3 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue transition-all">
+                            <i class="fab fa-linkedin mr-2"></i>
+                            LinkedIn
+                        </a>
                     </div>
-                    <div>
-                        <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Message</label>
-                        <textarea name="message" 
-                                  id="message" 
-                                  rows="5" 
-                                  required 
-                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
-                    </div>
-                    <button type="submit" 
-                            class="w-full px-6 py-3 text-white rounded-lg transition-all duration-300 hover:shadow-lg"
-                            style="background-color: #4658fb;">
-                        Send Message
-                    </button>
-                </form>
+                </div>
             </div>
 
-            <!-- Contact Information -->
-            <div class="space-y-8">
-                <!-- General Contact Info -->
-                <div class="bg-white rounded-xl shadow-md p-8">
-                    <h2 class="text-2xl font-bold mb-6" style="color: #4658fb;">Contact Information</h2>
-                    {% if site_settings and site_settings.contact_email %}
-                    <div class="flex items-start mb-4">
-                        <div class="flex-shrink-0">
-                            <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                            </svg>
+            <!-- Contact Form -->
+            <div class="lg:col-span-2">
+                <div class="contact-card rounded-xl border border-neon-blue/20 p-8">
+                    <h2 class="text-2xl font-bold mb-6 bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
+                        Send Us a Message
+                    </h2>
+                    <form action="#" method="POST" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Name</label>
+                                <input type="text" 
+                                       id="name" 
+                                       name="name" 
+                                       required 
+                                       class="w-full px-4 py-3 rounded-lg bg-cyber-darker border border-neon-blue/20 text-gray-300 glow-input focus:outline-none">
+                            </div>
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                                <input type="email" 
+                                       id="email" 
+                                       name="email" 
+                                       required 
+                                       class="w-full px-4 py-3 rounded-lg bg-cyber-darker border border-neon-blue/20 text-gray-300 glow-input focus:outline-none">
+                            </div>
                         </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-900">Email</p>
-                            <a href="mailto:{{ site_settings.contact_email }}" class="text-blue-600 hover:underline">
-                                {{ site_settings.contact_email }}
-                            </a>
+
+                        <div>
+                            <label for="subject" class="block text-sm font-medium text-gray-300 mb-2">Subject</label>
+                            <input type="text" 
+                                   id="subject" 
+                                   name="subject" 
+                                   required 
+                                   class="w-full px-4 py-3 rounded-lg bg-cyber-darker border border-neon-blue/20 text-gray-300 glow-input focus:outline-none">
                         </div>
-                    </div>
-                    {% endif %}
-                </div>
 
-                <!-- Social Media Links -->
-                {% if site_settings and (site_settings.facebook_url or site_settings.twitter_url or site_settings.instagram_url or site_settings.linkedin_url) %}
-                <div class="bg-white rounded-xl shadow-md p-8">
-                    <h2 class="text-2xl font-bold mb-6" style="color: #4658fb;">Follow Us</h2>
-                    <div class="grid grid-cols-2 gap-4">
-                        {% if site_settings.facebook_url %}
-                        <a href="{{ site_settings.facebook_url }}" target="_blank" rel="noopener noreferrer" 
-                           class="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors duration-300">
-                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
-                            </svg>
-                            <span>Facebook</span>
-                        </a>
-                        {% endif %}
-                        
-                        {% if site_settings.twitter_url %}
-                        <a href="{{ site_settings.twitter_url }}" target="_blank" rel="noopener noreferrer" 
-                           class="flex items-center space-x-2 text-gray-700 hover:text-blue-400 transition-colors duration-300">
-                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
-                            </svg>
-                            <span>Twitter</span>
-                        </a>
-                        {% endif %}
-                        
-                        {% if site_settings.instagram_url %}
-                        <a href="{{ site_settings.instagram_url }}" target="_blank" rel="noopener noreferrer" 
-                           class="flex items-center space-x-2 text-gray-700 hover:text-pink-600 transition-colors duration-300">
-                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                            </svg>
-                            <span>Instagram</span>
-                        </a>
-                        {% endif %}
-                        
-                        {% if site_settings.linkedin_url %}
-                        <a href="{{ site_settings.linkedin_url }}" target="_blank" rel="noopener noreferrer" 
-                           class="flex items-center space-x-2 text-gray-700 hover:text-blue-700 transition-colors duration-300">
-                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                            </svg>
-                            <span>LinkedIn</span>
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
-                {% endif %}
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-gray-300 mb-2">Message</label>
+                            <textarea id="message" 
+                                      name="message" 
+                                      rows="6" 
+                                      required 
+                                      class="w-full px-4 py-3 rounded-lg bg-cyber-darker border border-neon-blue/20 text-gray-300 glow-input focus:outline-none"></textarea>
+                        </div>
 
-                <!-- Business Hours -->
-                <div class="bg-white rounded-xl shadow-md p-8">
-                    <h2 class="text-2xl font-bold mb-6" style="color: #4658fb;">Business Hours</h2>
-                    <ul class="space-y-2">
-                        <li class="flex justify-between">
-                            <span class="text-gray-600">Monday - Friday</span>
-                            <span class="font-semibold">9:00 AM - 5:00 PM</span>
-                        </li>
-                        <li class="flex justify-between">
-                            <span class="text-gray-600">Saturday</span>
-                            <span class="font-semibold">10:00 AM - 2:00 PM</span>
-                        </li>
-                        <li class="flex justify-between">
-                            <span class="text-gray-600">Sunday</span>
-                            <span class="font-semibold">Closed</span>
-                        </li>
-                    </ul>
+                        <div class="flex items-center">
+                            <button type="submit" 
+                                    class="gradient-border rounded-lg">
+                                <span class="px-8 py-3 inline-block text-neon-blue hover:text-neon-purple transition-colors">
+                                    Send Message
+                                </span>
+                            </button>
+                            <span class="ml-4 text-sm text-gray-400">
+                                <i class="fas fa-shield-alt mr-1"></i>
+                                Your data is secure
+                            </span>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-16 bg-cyber-darker/50">
+    <div class="container mx-auto max-w-4xl px-4">
+        <h2 class="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
+            Frequently Asked Questions
+        </h2>
+        <div class="space-y-4">
+            {% for faq in [
+                {
+                    'question': 'How quickly can I expect a response?',
+                    'answer': 'We typically respond within 2-4 business hours. For urgent matters, please indicate in your subject line.'
+                },
+                {
+                    'question': 'Can I contribute to CodeVault?',
+                    'answer': 'Yes! We welcome contributions from the community. Check our GitHub repository or contact us directly.'
+                },
+                {
+                    'question': 'Do you offer technical support?',
+                    'answer': 'We provide support for our platform and content. For specific technical issues, our community forum is a great resource.'
+                }
+            ] %}
+            <div class="contact-card rounded-xl border border-neon-blue/20 p-6">
+                <h3 class="text-lg font-semibold text-white mb-2">{{ faq.question }}</h3>
+                <p class="text-gray-400">{{ faq.answer }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
 {% endblock %}
