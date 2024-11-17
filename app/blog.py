@@ -75,10 +75,8 @@ def create():
         if 'featured_image' in request.files:
             file = request.files['featured_image']
             if file and file.filename and allowed_file(file.filename):
-                # Read the file data and mime type
                 image_data = file.read()
                 mimetype = file.content_type
-                
                 post.featured_image_data = image_data
                 post.featured_image_mimetype = mimetype
         
@@ -90,11 +88,12 @@ def create():
     
     return render_template('blog/create.html')
 
+# For editing posts
 @blog.route('/blog/edit/<int:post_id>', methods=['GET', 'POST'])
 @login_required
 def edit(post_id):
     if not current_user.is_administrator():
-        abort(403)  # Only admins can edit posts
+        abort(403)
     
     post = Post.query.get_or_404(post_id)
     
@@ -110,12 +109,8 @@ def edit(post_id):
         if 'featured_image' in request.files:
             file = request.files['featured_image']
             if file and file.filename and allowed_file(file.filename):
-                # Read the file data and mime type
-                image_data = file.read()
-                mimetype = file.content_type
-                
-                post.featured_image_data = image_data
-                post.featured_image_mimetype = mimetype
+                post.featured_image_data = file.read()
+                post.featured_image_mimetype = file.content_type
         
         db.session.commit()
         flash('Post updated successfully!', 'success')
@@ -123,8 +118,10 @@ def edit(post_id):
     
     return render_template('blog/create.html', 
                           post=post, 
-                          is_edit=True,
-                          title="Edit Post")
+                          is_edit=True)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
 
 @blog.route('/blog/delete/<int:post_id>', methods=['POST'])
 @login_required
