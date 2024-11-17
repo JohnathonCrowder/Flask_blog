@@ -96,6 +96,41 @@
                 </div>
             </div>
 
+            <!-- SEO Settings -->
+<div class="bg-white shadow-md rounded-lg overflow-hidden">
+    <div class="px-4 py-5 sm:px-6 bg-gray-50 border-b border-gray-200">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">
+            SEO Settings
+        </h3>
+        <p class="mt-1 text-sm text-gray-500">
+            Optimize your site for search engines.
+        </p>
+    </div>
+    <div class="px-4 py-5 sm:p-6">
+        <div class="grid grid-cols-1 gap-6">
+            <div>
+                <label for="meta_keywords" class="block text-sm font-medium text-gray-700">Meta Keywords</label>
+                <input type="text" name="meta_keywords" id="meta_keywords" 
+                       value="{{ settings.meta_keywords if settings else '' }}"
+                       class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <p class="mt-1 text-sm text-gray-500">Separate keywords with commas</p>
+            </div>
+            <div>
+                <label for="meta_description" class="block text-sm font-medium text-gray-700">Meta Description</label>
+                <textarea name="meta_description" id="meta_description" rows="3" 
+                          class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">{{ settings.meta_description if settings else '' }}</textarea>
+                <p class="mt-1 text-sm text-gray-500">Recommended length: 150-160 characters</p>
+            </div>
+            <div>
+                <label for="og_image" class="block text-sm font-medium text-gray-700">Default Social Share Image</label>
+                <input type="file" name="og_image" id="og_image" accept="image/*"
+                       class="mt-1 block w-full shadow-sm sm:text-sm">
+                <p class="mt-1 text-sm text-gray-500">Recommended size: 1200x630 pixels</p>
+            </div>
+        </div>
+    </div>
+</div>
+
             <!-- Site Options -->
             <div class="bg-white shadow-md rounded-lg overflow-hidden">
                 <div class="px-4 py-5 sm:px-6 bg-gray-50 border-b border-gray-200">

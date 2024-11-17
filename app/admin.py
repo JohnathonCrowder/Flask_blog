@@ -93,7 +93,7 @@ def site_settings():
             settings = SiteSettings()
             db.session.add(settings)
         
-        # Update settings
+        # Update existing settings
         settings.site_name = request.form.get('site_name', '')
         settings.site_description = request.form.get('site_description', '')
         settings.contact_email = request.form.get('contact_email', '')
@@ -106,6 +106,18 @@ def site_settings():
         settings.twitter_url = request.form.get('twitter_url', '')
         settings.instagram_url = request.form.get('instagram_url', '')
         settings.linkedin_url = request.form.get('linkedin_url', '')
+
+        # SEO settings
+        settings.meta_keywords = request.form.get('meta_keywords', '')
+        settings.meta_description = request.form.get('meta_description', '')
+        
+        # Handle OG image upload
+        if 'og_image' in request.files:
+            file = request.files['og_image']
+            if file and file.filename:
+                # Read the file data and mime type
+                settings.og_image = file.read()
+                settings.og_image_type = file.content_type
 
         db.session.commit()
         flash('Settings updated successfully!', 'success')
@@ -143,3 +155,13 @@ def delete_post(post_id):
     db.session.commit()
     flash(f"Post '{post.title}' has been deleted.", 'success')
     return redirect(url_for('admin.manage_posts'))
+
+@admin.route('/admin/og-image')
+def serve_og_image():
+    settings = SiteSettings.query.first()
+    if not settings or not settings.og_image:
+        abort(404)
+    return send_file(
+        io.BytesIO(settings.og_image),
+        mimetype=settings.og_image_type
+    )

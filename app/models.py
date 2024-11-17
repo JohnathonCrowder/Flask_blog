@@ -62,3 +62,5 @@ class SiteSettings(db.Model):
     # Meta settings
     meta_keywords = db.Column(db.String(200))
     meta_description = db.Column(db.String(200))
+    og_image = db.Column(db.LargeBinary)
+    og_image_type = db.Column(db.String(32))
