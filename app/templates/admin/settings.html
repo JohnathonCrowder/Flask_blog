@@ -16,7 +16,7 @@
             </a>
         </div>
 
-        <form method="POST" class="space-y-6">
+        <form method="POST" enctype="multipart/form-data" class="space-y-6">
             <!-- General Settings -->
             <div class="bg-white shadow-md rounded-lg overflow-hidden">
                 <div class="px-4 py-5 sm:px-6 bg-gray-50 border-b border-gray-200">
@@ -97,71 +97,77 @@
             </div>
 
             <!-- SEO Settings -->
-<div class="bg-white shadow-md rounded-lg overflow-hidden">
-    <div class="px-4 py-5 sm:px-6 bg-gray-50 border-b border-gray-200">
-        <h3 class="text-lg leading-6 font-medium text-gray-900">
-            SEO Settings
-        </h3>
-        <p class="mt-1 text-sm text-gray-500">
-            Optimize your site for search engines.
-        </p>
-    </div>
-    <div class="px-4 py-5 sm:p-6">
-        <div class="grid grid-cols-1 gap-6">
-            <div>
-                <label for="meta_keywords" class="block text-sm font-medium text-gray-700">Meta Keywords</label>
-                <input type="text" name="meta_keywords" id="meta_keywords" 
-                       value="{{ settings.meta_keywords if settings else '' }}"
-                       class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                <p class="mt-1 text-sm text-gray-500">Separate keywords with commas</p>
-            </div>
-            <div>
-                <label for="meta_description" class="block text-sm font-medium text-gray-700">Meta Description</label>
-                <textarea name="meta_description" id="meta_description" rows="3" 
-                          class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">{{ settings.meta_description if settings else '' }}</textarea>
-                <p class="mt-1 text-sm text-gray-500">Recommended length: 150-160 characters</p>
-            </div>
-            <div>
-                <label for="og_image" class="block text-sm font-medium text-gray-700">Default Social Share Image</label>
-                <div class="mt-2 flex items-center">
-                    <div class="flex-shrink-0">
-                        {% if settings and settings.og_image %}
-                        <div class="relative">
-                            <img src="{{ url_for('admin.serve_og_image') }}" 
-                                 alt="Current OG Image" 
-                                 class="h-32 w-auto rounded-lg shadow-md">
-                            <button type="button" 
-                                    onclick="document.getElementById('remove_og_image').value = 'true'; this.closest('div').style.display = 'none';"
-                                    class="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 focus:outline-none">
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                            </button>
+            <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                <div class="px-4 py-5 sm:px-6 bg-gray-50 border-b border-gray-200">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                        SEO Settings
+                    </h3>
+                    <p class="mt-1 text-sm text-gray-500">
+                        Optimize your site for search engines.
+                    </p>
+                </div>
+                <div class="px-4 py-5 sm:p-6">
+                    <div class="grid grid-cols-1 gap-6">
+                        <div>
+                            <label for="meta_keywords" class="block text-sm font-medium text-gray-700">Meta Keywords</label>
+                            <input type="text" name="meta_keywords" id="meta_keywords" 
+                                   value="{{ settings.meta_keywords if settings else '' }}"
+                                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                            <p class="mt-1 text-sm text-gray-500">Separate keywords with commas</p>
                         </div>
-                        {% endif %}
-                    </div>
-                    <div class="ml-4 flex-grow">
-                        <div class="flex items-center justify-center w-full">
-                            <label for="og_image" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                    <svg class="w-8 h-8 mb-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                                    </svg>
-                                    <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
-                                    <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                        <div>
+                            <label for="meta_description" class="block text-sm font-medium text-gray-700">Meta Description</label>
+                            <textarea name="meta_description" id="meta_description" rows="3" 
+                                      class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">{{ settings.meta_description if settings else '' }}</textarea>
+                            <p class="mt-1 text-sm text-gray-500">Recommended length: 150-160 characters</p>
+                        </div>
+                        <div>
+                            <label for="og_image" class="block text-sm font-medium text-gray-700">Default Social Share Image</label>
+                            <div class="mt-2 flex items-center">
+                                <div class="flex-shrink-0">
+                                    {% if settings and settings.og_image %}
+                                    <div class="relative">
+                                        <img src="{{ url_for('admin.serve_og_image') }}" 
+                                             alt="Current OG Image" 
+                                             class="h-32 w-auto rounded-lg shadow-md">
+                                        <button type="button" 
+                                                onclick="document.getElementById('remove_og_image').value = 'true'; this.closest('div').style.display = 'none';"
+                                                class="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 focus:outline-none">
+                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                        </button>
+                                        <!-- Debug info -->
+                                        <div class="mt-2 text-xs text-gray-500">
+                                            Image size: {{ settings.og_image|length }} bytes
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <div class="text-xs text-gray-500">No image currently set</div>
+                                    {% endif %}
                                 </div>
-                                <input id="og_image" name="og_image" type="file" class="hidden" accept="image/*" onchange="previewImage(this)">
-                            </label>
+                                <div class="ml-4 flex-grow">
+                                    <div class="flex items-center justify-center w-full">
+                                        <label for="og_image" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                                <svg class="w-8 h-8 mb-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                                </svg>
+                                                <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                                                <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                                            </div>
+                                            <input id="og_image" name="og_image" type="file" class="hidden" accept="image/*" onchange="previewImage(this)">
+                                        </label>
+                                    </div>
+                                    <p class="mt-1 text-sm text-gray-500">Recommended size: 1200x630 pixels</p>
+                                </div>
+                            </div>
+                            <!-- Hidden input for tracking image removal -->
+                            <input type="hidden" name="remove_og_image" id="remove_og_image" value="false">
                         </div>
-                        <p class="mt-1 text-sm text-gray-500">Recommended size: 1200x630 pixels</p>
                     </div>
                 </div>
-                <!-- Hidden input for tracking image removal -->
-                <input type="hidden" name="remove_og_image" id="remove_og_image" value="false">
             </div>
-        </div>
-    </div>
-</div>
 
             <!-- Site Options -->
             <div class="bg-white shadow-md rounded-lg overflow-hidden">
@@ -211,45 +217,46 @@
     </div>
 </div>
 
-
+<!-- Add this script at the bottom of your settings.html file -->
 <script>
-    function previewImage(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const previewContainer = input.closest('.flex-grow').previousElementSibling;
+            let preview;
             
-            reader.onload = function(e) {
-                const previewContainer = input.closest('.flex-grow').previousElementSibling;
-                let preview;
-                
-                if (previewContainer.querySelector('img')) {
-                    preview = previewContainer.querySelector('img');
-                } else {
-                    const div = document.createElement('div');
-                    div.className = 'relative';
-                    preview = document.createElement('img');
-                    preview.className = 'h-32 w-auto rounded-lg shadow-md';
-                    const removeButton = document.createElement('button');
-                    removeButton.className = 'absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 focus:outline-none';
-                    removeButton.innerHTML = `
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    `;
-                    removeButton.onclick = function() {
-                        input.value = '';
-                        div.remove();
-                        document.getElementById('remove_og_image').value = 'true';
-                    };
-                    div.appendChild(preview);
-                    div.appendChild(removeButton);
-                    previewContainer.appendChild(div);
-                }
-                
-                preview.src = e.target.result;
+            if (previewContainer.querySelector('img')) {
+                preview = previewContainer.querySelector('img');
+            } else {
+                const div = document.createElement('div');
+                div.className = 'relative';
+                preview = document.createElement('img');
+                preview.className = 'h-32 w-auto rounded-lg shadow-md';
+                const removeButton = document.createElement('button');
+                removeButton.className = 'absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 focus:outline-none';
+                removeButton.innerHTML = `
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                `;
+                removeButton.onclick = function() {
+                    input.value = '';
+                    div.remove();
+                    document.getElementById('remove_og_image').value = 'true';
+                };
+                div.appendChild(preview);
+                div.appendChild(removeButton);
+                previewContainer.innerHTML = '';
+                previewContainer.appendChild(div);
             }
             
-            reader.readAsDataURL(input.files[0]);
+            preview.src = e.target.result;
         }
+        
+        reader.readAsDataURL(input.files[0]);
     }
-    </script>
+}
+</script>
 {% endblock %}

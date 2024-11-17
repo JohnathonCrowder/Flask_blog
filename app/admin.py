@@ -1,13 +1,11 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, current_app, abort, send_file
 from flask_login import login_required, current_user
 from .models import db, User, Post, SiteSettings
 from functools import wraps
 from datetime import datetime, timedelta
 from flask import request, url_for
 from sqlalchemy import or_
-from datetime import datetime, timedelta
-
-
+import io
 
 admin = Blueprint('admin', __name__)
 
@@ -82,7 +80,6 @@ def manage_posts():
 
     return render_template('admin/posts.html', posts=posts, authors=authors)
 
-
 @admin.route('/admin/settings', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -93,7 +90,7 @@ def site_settings():
             settings = SiteSettings()
             db.session.add(settings)
         
-        # Update existing settings
+        # Update settings
         settings.site_name = request.form.get('site_name', '')
         settings.site_description = request.form.get('site_description', '')
         settings.contact_email = request.form.get('contact_email', '')
@@ -113,20 +110,52 @@ def site_settings():
         
         # Handle OG image
         if request.form.get('remove_og_image') == 'true':
+            current_app.logger.info("Removing OG image")
             settings.og_image = None
             settings.og_image_type = None
         elif 'og_image' in request.files:
             file = request.files['og_image']
             if file and file.filename:
+                current_app.logger.info(f"Saving new OG image: {file.filename}")
                 settings.og_image = file.read()
                 settings.og_image_type = file.content_type
+                current_app.logger.info(f"Saved image of type: {settings.og_image_type} and size: {len(settings.og_image)} bytes")
 
         db.session.commit()
         flash('Settings updated successfully!', 'success')
         return redirect(url_for('admin.site_settings'))
 
     settings = SiteSettings.query.first()
+    if settings and settings.og_image:
+        current_app.logger.info(f"Settings page loaded with existing OG image of size: {len(settings.og_image)} bytes")
     return render_template('admin/settings.html', settings=settings)
+
+@admin.route('/admin/og-image')
+def serve_og_image():
+    settings = SiteSettings.query.first()
+    if not settings or not settings.og_image:
+        current_app.logger.error("No OG image found")
+        abort(404)
+    current_app.logger.info(f"Serving OG image of type: {settings.og_image_type}")
+    return send_file(
+        io.BytesIO(settings.og_image),
+        mimetype=settings.og_image_type
+    )
+
+@admin.route('/admin/test-og-image')
+@login_required
+@admin_required
+def test_og_image():
+    settings = SiteSettings.query.first()
+    if not settings:
+        return jsonify({'error': 'No settings found'})
+    
+    image_info = {
+        'has_image': settings.og_image is not None,
+        'image_type': settings.og_image_type,
+        'image_size': len(settings.og_image) if settings.og_image else 0
+    }
+    return jsonify(image_info)
 
 @admin.route('/admin/toggle_admin/<int:user_id>', methods=['POST'])
 @login_required
@@ -157,13 +186,3 @@ def delete_post(post_id):
     db.session.commit()
     flash(f"Post '{post.title}' has been deleted.", 'success')
     return redirect(url_for('admin.manage_posts'))
-
-@admin.route('/admin/og-image')
-def serve_og_image():
-    settings = SiteSettings.query.first()
-    if not settings or not settings.og_image:
-        abort(404)
-    return send_file(
-        io.BytesIO(settings.og_image),
-        mimetype=settings.og_image_type
-    )
