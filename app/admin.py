@@ -111,11 +111,13 @@ def site_settings():
         settings.meta_keywords = request.form.get('meta_keywords', '')
         settings.meta_description = request.form.get('meta_description', '')
         
-        # Handle OG image upload
-        if 'og_image' in request.files:
+        # Handle OG image
+        if request.form.get('remove_og_image') == 'true':
+            settings.og_image = None
+            settings.og_image_type = None
+        elif 'og_image' in request.files:
             file = request.files['og_image']
             if file and file.filename:
-                # Read the file data and mime type
                 settings.og_image = file.read()
                 settings.og_image_type = file.content_type
 

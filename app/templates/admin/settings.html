@@ -123,9 +123,41 @@
             </div>
             <div>
                 <label for="og_image" class="block text-sm font-medium text-gray-700">Default Social Share Image</label>
-                <input type="file" name="og_image" id="og_image" accept="image/*"
-                       class="mt-1 block w-full shadow-sm sm:text-sm">
-                <p class="mt-1 text-sm text-gray-500">Recommended size: 1200x630 pixels</p>
+                <div class="mt-2 flex items-center">
+                    <div class="flex-shrink-0">
+                        {% if settings and settings.og_image %}
+                        <div class="relative">
+                            <img src="{{ url_for('admin.serve_og_image') }}" 
+                                 alt="Current OG Image" 
+                                 class="h-32 w-auto rounded-lg shadow-md">
+                            <button type="button" 
+                                    onclick="document.getElementById('remove_og_image').value = 'true'; this.closest('div').style.display = 'none';"
+                                    class="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 focus:outline-none">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="ml-4 flex-grow">
+                        <div class="flex items-center justify-center w-full">
+                            <label for="og_image" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <svg class="w-8 h-8 mb-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                    </svg>
+                                    <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                                    <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                                </div>
+                                <input id="og_image" name="og_image" type="file" class="hidden" accept="image/*" onchange="previewImage(this)">
+                            </label>
+                        </div>
+                        <p class="mt-1 text-sm text-gray-500">Recommended size: 1200x630 pixels</p>
+                    </div>
+                </div>
+                <!-- Hidden input for tracking image removal -->
+                <input type="hidden" name="remove_og_image" id="remove_og_image" value="false">
             </div>
         </div>
     </div>
@@ -178,4 +210,46 @@
         </form>
     </div>
 </div>
+
+
+<script>
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const previewContainer = input.closest('.flex-grow').previousElementSibling;
+                let preview;
+                
+                if (previewContainer.querySelector('img')) {
+                    preview = previewContainer.querySelector('img');
+                } else {
+                    const div = document.createElement('div');
+                    div.className = 'relative';
+                    preview = document.createElement('img');
+                    preview.className = 'h-32 w-auto rounded-lg shadow-md';
+                    const removeButton = document.createElement('button');
+                    removeButton.className = 'absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 focus:outline-none';
+                    removeButton.innerHTML = `
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    `;
+                    removeButton.onclick = function() {
+                        input.value = '';
+                        div.remove();
+                        document.getElementById('remove_og_image').value = 'true';
+                    };
+                    div.appendChild(preview);
+                    div.appendChild(removeButton);
+                    previewContainer.appendChild(div);
+                }
+                
+                preview.src = e.target.result;
+            }
+            
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    </script>
 {% endblock %}
