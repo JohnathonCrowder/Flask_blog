@@ -22,16 +22,20 @@ def admin_required(f):
 @login_required
 @admin_required
 def admin_dashboard():
-    # Get total counts
     total_users = User.query.count()
     total_posts = Post.query.count()
-
-    # Get counts for the last 7 days
+    
     seven_days_ago = datetime.utcnow() - timedelta(days=7)
     new_users_count = User.query.filter(User.created_at >= seven_days_ago).count()
     new_posts_count = Post.query.filter(Post.created_at >= seven_days_ago).count()
-
-    # Get recent users and posts
+    
+    draft_posts_count = Post.query.filter_by(status='draft').count()
+    new_drafts_count = Post.query.filter(Post.status == 'draft', Post.created_at >= seven_days_ago).count()
+    
+    categories = db.session.query(Post.category, db.func.count(Post.id)).group_by(Post.category).all()
+    categories_count = len(categories)
+    popular_category = max(categories, key=lambda x: x[1])[0] if categories else "None"
+    
     recent_users = User.query.order_by(User.created_at.desc()).limit(5).all()
     recent_posts = Post.query.order_by(Post.created_at.desc()).limit(5).all()
 
@@ -40,6 +44,10 @@ def admin_dashboard():
                            total_posts=total_posts,
                            new_users_count=new_users_count,
                            new_posts_count=new_posts_count,
+                           draft_posts_count=draft_posts_count,
+                           new_drafts_count=new_drafts_count,
+                           categories_count=categories_count,
+                           popular_category=popular_category,
                            recent_users=recent_users,
                            recent_posts=recent_posts)
 
