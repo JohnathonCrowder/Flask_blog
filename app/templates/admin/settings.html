@@ -1,262 +1,289 @@
+{# app/templates/admin/settings.html #}
+
 {% extends "base.html" %}
 
 {% block title %}Site Settings - Admin Dashboard{% endblock %}
 
+{% block head %}
+<style>
+    .settings-grid {
+        background: 
+            linear-gradient(90deg, rgba(33, 150, 243, 0.03) 1px, transparent 1px),
+            linear-gradient(rgba(33, 150, 243, 0.03) 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+
+    .settings-card {
+        background: linear-gradient(145deg, rgba(15, 23, 42, 0.6), rgba(25, 33, 52, 0.6));
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+
+    .settings-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 30px rgba(33, 150, 243, 0.15);
+    }
+
+    .glow-input {
+        transition: all 0.3s ease;
+    }
+
+    .glow-input:focus {
+        box-shadow: 0 0 15px rgba(33, 150, 243, 0.3);
+        border-color: #2196f3;
+    }
+
+    .tab-button {
+        transition: all 0.3s ease;
+    }
+
+    .tab-button.active {
+        background: linear-gradient(90deg, #2196f3, #b624ff);
+        box-shadow: 0 0 15px rgba(33, 150, 243, 0.4);
+    }
+
+    .image-preview {
+        background: linear-gradient(45deg, rgba(33, 150, 243, 0.1), rgba(182, 36, 255, 0.1));
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="bg-gray-100 min-h-screen py-8">
+<div class="settings-grid min-h-screen py-8">
     <div class="container mx-auto px-4 max-w-6xl">
-        <div class="mb-6 flex justify-between items-center">
-            <h1 class="text-3xl font-bold text-gray-800">Site Settings</h1>
+        <!-- Header -->
+        <div class="mb-8 flex justify-between items-center">
+            <div>
+                <h1 class="text-4xl font-bold bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
+                    Site Settings
+                </h1>
+                <p class="text-gray-400 mt-2">Configure your website's global settings</p>
+            </div>
             <a href="{{ url_for('admin.admin_dashboard') }}" 
-               class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                </svg>
-                Back to Dashboard
+               class="gradient-border rounded-lg">
+                <span class="px-4 py-2 inline-block text-neon-blue hover:text-neon-purple transition-colors">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to Dashboard
+                </span>
             </a>
         </div>
 
-        <form method="POST" enctype="multipart/form-data" class="space-y-6">
-            <!-- General Settings -->
-            <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                <div class="px-4 py-5 sm:px-6 bg-gray-50 border-b border-gray-200">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">
-                        General Settings
-                    </h3>
-                    <p class="mt-1 text-sm text-gray-500">
-                        Basic configuration for your website.
-                    </p>
-                </div>
-                <div class="px-4 py-5 sm:p-6">
-                    <div class="grid grid-cols-1 gap-6">
+        <form method="POST" enctype="multipart/form-data" class="space-y-8">
+            <!-- Settings Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- General Settings -->
+                <div class="settings-card rounded-xl border border-neon-blue/20 p-6 lg:col-span-2">
+                    <div class="flex items-center mb-6">
+                        <i class="fas fa-cog text-2xl text-neon-blue mr-3"></i>
+                        <h2 class="text-2xl font-bold text-white">General Settings</h2>
+                    </div>
+                    <div class="space-y-6">
                         <div>
-                            <label for="site_name" class="block text-sm font-medium text-gray-700">Site Name</label>
+                            <label for="site_name" class="block text-sm font-medium text-gray-300 mb-2">Site Name</label>
                             <input type="text" name="site_name" id="site_name" 
                                    value="{{ settings.site_name if settings else '' }}"
-                                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                   class="w-full px-4 py-2 bg-cyber-dark border border-neon-blue/20 rounded text-white glow-input focus:outline-none">
                         </div>
                         <div>
-                            <label for="site_description" class="block text-sm font-medium text-gray-700">Site Description</label>
+                            <label for="site_description" class="block text-sm font-medium text-gray-300 mb-2">Site Description</label>
                             <textarea name="site_description" id="site_description" rows="3" 
-                                      class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">{{ settings.site_description if settings else '' }}</textarea>
+                                      class="w-full px-4 py-2 bg-cyber-dark border border-neon-blue/20 rounded text-white glow-input focus:outline-none">{{ settings.site_description if settings else '' }}</textarea>
                         </div>
                         <div>
-                            <label for="contact_email" class="block text-sm font-medium text-gray-700">Contact Email</label>
+                            <label for="contact_email" class="block text-sm font-medium text-gray-300 mb-2">Contact Email</label>
                             <input type="email" name="contact_email" id="contact_email" 
                                    value="{{ settings.contact_email if settings else '' }}"
-                                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                   class="w-full px-4 py-2 bg-cyber-dark border border-neon-blue/20 rounded text-white glow-input focus:outline-none">
                         </div>
                         <div>
-                            <label for="posts_per_page" class="block text-sm font-medium text-gray-700">Posts Per Page</label>
+                            <label for="posts_per_page" class="block text-sm font-medium text-gray-300 mb-2">Posts Per Page</label>
                             <input type="number" name="posts_per_page" id="posts_per_page" 
                                    value="{{ settings.posts_per_page if settings else 10 }}"
-                                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                   class="w-full px-4 py-2 bg-cyber-dark border border-neon-blue/20 rounded text-white glow-input focus:outline-none">
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Social Media Settings -->
-            <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                <div class="px-4 py-5 sm:px-6 bg-gray-50 border-b border-gray-200">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">
-                        Social Media Links
-                    </h3>
-                    <p class="mt-1 text-sm text-gray-500">
-                        Connect your social media accounts.
-                    </p>
+                <!-- Site Options -->
+                <div class="settings-card rounded-xl border border-neon-blue/20 p-6">
+                    <div class="flex items-center mb-6">
+                        <i class="fas fa-toggle-on text-2xl text-neon-purple mr-3"></i>
+                        <h2 class="text-2xl font-bold text-white">Site Options</h2>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between p-4 border border-neon-blue/20 rounded-lg">
+                            <div>
+                                <h3 class="text-white font-medium">Maintenance Mode</h3>
+                                <p class="text-sm text-gray-400">Enable site maintenance mode</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="maintenance_mode" class="sr-only peer" 
+                                       {% if settings and settings.maintenance_mode %}checked{% endif %}>
+                                <div class="w-11 h-6 bg-cyber-dark peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-neon-blue after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neon-purple"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between p-4 border border-neon-blue/20 rounded-lg">
+                            <div>
+                                <h3 class="text-white font-medium">Allow Registration</h3>
+                                <p class="text-sm text-gray-400">Enable user registration</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="allow_registration" class="sr-only peer"
+                                       {% if settings and settings.allow_registration %}checked{% endif %}>
+                                <div class="w-11 h-6 bg-cyber-dark peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-neon-blue after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neon-purple"></div>
+                            </label>
+                        </div>
+                    </div>
                 </div>
-                <div class="px-4 py-5 sm:p-6">
-                    <div class="grid grid-cols-1 gap-6">
+
+                <!-- Social Media Links -->
+                <div class="settings-card rounded-xl border border-neon-blue/20 p-6">
+                    <div class="flex items-center mb-6">
+                        <i class="fas fa-share-alt text-2xl text-neon-green mr-3"></i>
+                        <h2 class="text-2xl font-bold text-white">Social Media</h2>
+                    </div>
+                    <div class="space-y-6">
                         <div>
-                            <label for="facebook_url" class="block text-sm font-medium text-gray-700">Facebook URL</label>
-                            <input type="url" name="facebook_url" id="facebook_url" 
+                            <label class="flex items-center text-sm font-medium text-gray-300 mb-2">
+                                <i class="fab fa-facebook text-[#1877F2] mr-2"></i> Facebook URL
+                            </label>
+                            <input type="url" name="facebook_url" 
                                    value="{{ settings.facebook_url if settings else '' }}"
-                                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                   class="w-full px-4 py-2 bg-cyber-dark border border-neon-blue/20 rounded text-white glow-input focus:outline-none">
                         </div>
                         <div>
-                            <label for="twitter_url" class="block text-sm font-medium text-gray-700">Twitter URL</label>
-                            <input type="url" name="twitter_url" id="twitter_url" 
+                            <label class="flex items-center text-sm font-medium text-gray-300 mb-2">
+                                <i class="fab fa-twitter text-[#1DA1F2] mr-2"></i> Twitter URL
+                            </label>
+                            <input type="url" name="twitter_url" 
                                    value="{{ settings.twitter_url if settings else '' }}"
-                                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                   class="w-full px-4 py-2 bg-cyber-dark border border-neon-blue/20 rounded text-white glow-input focus:outline-none">
                         </div>
                         <div>
-                            <label for="instagram_url" class="block text-sm font-medium text-gray-700">Instagram URL</label>
-                            <input type="url" name="instagram_url" id="instagram_url" 
+                            <label class="flex items-center text-sm font-medium text-gray-300 mb-2">
+                                <i class="fab fa-instagram text-[#E1306C] mr-2"></i> Instagram URL
+                            </label>
+                            <input type="url" name="instagram_url" 
                                    value="{{ settings.instagram_url if settings else '' }}"
-                                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                   class="w-full px-4 py-2 bg-cyber-dark border border-neon-blue/20 rounded text-white glow-input focus:outline-none">
                         </div>
                         <div>
-                            <label for="linkedin_url" class="block text-sm font-medium text-gray-700">LinkedIn URL</label>
-                            <input type="url" name="linkedin_url" id="linkedin_url" 
+                            <label class="flex items-center text-sm font-medium text-gray-300 mb-2">
+                                <i class="fab fa-linkedin text-[#0A66C2] mr-2"></i> LinkedIn URL
+                            </label>
+                            <input type="url" name="linkedin_url" 
                                    value="{{ settings.linkedin_url if settings else '' }}"
-                                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                   class="w-full px-4 py-2 bg-cyber-dark border border-neon-blue/20 rounded text-white glow-input focus:outline-none">
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- SEO Settings -->
-            <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                <div class="px-4 py-5 sm:px-6 bg-gray-50 border-b border-gray-200">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">
-                        SEO Settings
-                    </h3>
-                    <p class="mt-1 text-sm text-gray-500">
-                        Optimize your site for search engines.
-                    </p>
-                </div>
-                <div class="px-4 py-5 sm:p-6">
-                    <div class="grid grid-cols-1 gap-6">
+                <!-- SEO Settings -->
+                <div class="settings-card rounded-xl border border-neon-blue/20 p-6 lg:col-span-2">
+                    <div class="flex items-center mb-6">
+                        <i class="fas fa-search text-2xl text-neon-blue mr-3"></i>
+                        <h2 class="text-2xl font-bold text-white">SEO Settings</h2>
+                    </div>
+                    <div class="space-y-6">
                         <div>
-                            <label for="meta_keywords" class="block text-sm font-medium text-gray-700">Meta Keywords</label>
+                            <label for="meta_keywords" class="block text-sm font-medium text-gray-300 mb-2">Meta Keywords</label>
                             <input type="text" name="meta_keywords" id="meta_keywords" 
                                    value="{{ settings.meta_keywords if settings else '' }}"
-                                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                            <p class="mt-1 text-sm text-gray-500">Separate keywords with commas</p>
+                                   class="w-full px-4 py-2 bg-cyber-dark border border-neon-blue/20 rounded text-white glow-input focus:outline-none">
+                            <p class="mt-1 text-sm text-gray-400">Separate keywords with commas</p>
                         </div>
                         <div>
-                            <label for="meta_description" class="block text-sm font-medium text-gray-700">Meta Description</label>
+                            <label for="meta_description" class="block text-sm font-medium text-gray-300 mb-2">Meta Description</label>
                             <textarea name="meta_description" id="meta_description" rows="3" 
-                                      class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">{{ settings.meta_description if settings else '' }}</textarea>
-                            <p class="mt-1 text-sm text-gray-500">Recommended length: 150-160 characters</p>
-                        </div>
-                        <div>
-                            <label for="og_image" class="block text-sm font-medium text-gray-700">Default Social Share Image</label>
-                            <div class="mt-2 flex items-center">
-                                <div class="flex-shrink-0">
-                                    {% if settings and settings.og_image %}
-                                    <div class="relative">
-                                        <img src="{{ url_for('admin.serve_og_image') }}" 
-                                             alt="Current OG Image" 
-                                             class="h-32 w-auto rounded-lg shadow-md">
-                                        <button type="button" 
-                                                onclick="document.getElementById('remove_og_image').value = 'true'; this.closest('div').style.display = 'none';"
-                                                class="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 focus:outline-none">
-                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                            </svg>
-                                        </button>
-                                        <!-- Debug info -->
-                                        <div class="mt-2 text-xs text-gray-500">
-                                            Image size: {{ settings.og_image|length }} bytes
-                                        </div>
-                                    </div>
-                                    {% else %}
-                                    <div class="text-xs text-gray-500">No image currently set</div>
-                                    {% endif %}
-                                </div>
-                                <div class="ml-4 flex-grow">
-                                    <div class="flex items-center justify-center w-full">
-                                        <label for="og_image" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-                                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                                <svg class="w-8 h-8 mb-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                                                </svg>
-                                                <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
-                                                <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
-                                            </div>
-                                            <input id="og_image" name="og_image" type="file" class="hidden" accept="image/*" onchange="previewImage(this)">
-                                        </label>
-                                    </div>
-                                    <p class="mt-1 text-sm text-gray-500">Recommended size: 1200x630 pixels</p>
-                                </div>
-                            </div>
-                            <!-- Hidden input for tracking image removal -->
-                            <input type="hidden" name="remove_og_image" id="remove_og_image" value="false">
+                                      class="w-full px-4 py-2 bg-cyber-dark border border-neon-blue/20 rounded text-white glow-input focus:outline-none">{{ settings.meta_description if settings else '' }}</textarea>
+                            <p class="mt-1 text-sm text-gray-400">Recommended length: 150-160 characters</p>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Site Options -->
-            <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                <div class="px-4 py-5 sm:px-6 bg-gray-50 border-b border-gray-200">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">
-                        Site Options
-                    </h3>
-                    <p class="mt-1 text-sm text-gray-500">
-                        Additional configuration options.
-                    </p>
-                </div>
-                <div class="px-4 py-5 sm:p-6">
+                <!-- Social Image -->
+                <div class="settings-card rounded-xl border border-neon-blue/20 p-6">
+                    <div class="flex items-center mb-6">
+                        <i class="fas fa-image text-2xl text-neon-purple mr-3"></i>
+                        <h2 class="text-2xl font-bold text-white">Social Image</h2>
+                    </div>
                     <div class="space-y-4">
-                        <div class="flex items-start">
-                            <div class="flex items-center h-5">
-                                <input type="checkbox" name="maintenance_mode" id="maintenance_mode"
-                                       {% if settings and settings.maintenance_mode %}checked{% endif %}
-                                       class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
-                            </div>
-                            <div class="ml-3 text-sm">
-                                <label for="maintenance_mode" class="font-medium text-gray-700">Maintenance Mode</label>
-                                <p class="text-gray-500">Enable this to show a maintenance page to visitors.</p>
-                            </div>
+                        {% if settings and settings.og_image %}
+                        <div class="relative">
+                            <img src="{{ url_for('admin.serve_og_image') }}" 
+                                 alt="Current OG Image" 
+                                 class="w-full h-40 object-cover rounded-lg">
+                            <button type="button" 
+                                    onclick="document.getElementById('remove_og_image').value = 'true'; this.closest('div').style.display = 'none';"
+                                    class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 focus:outline-none">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
-                        <div class="flex items-start">
-                            <div class="flex items-center h-5">
-                                <input type="checkbox" name="allow_registration" id="allow_registration"
-                                       {% if settings and settings.allow_registration %}checked{% endif %}
-                                       class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
-                            </div>
-                            <div class="ml-3 text-sm">
-                                <label for="allow_registration" class="font-medium text-gray-700">Allow Registration</label>
-                                <p class="text-gray-500">Allow new users to register on the site.</p>
-                            </div>
+                        {% endif %}
+                        <div class="flex items-center justify-center w-full">
+                            <label class="flex flex-col items-center justify-center w-full h-40 border-2 border-neon-blue/20 border-dashed rounded-lg cursor-pointer hover:border-neon-blue/40 image-preview">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <i class="fas fa-cloud-upload-alt text-3xl text-neon-blue mb-3"></i>
+                                    <p class="mb-2 text-sm text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                                    <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                                </div>
+                                <input id="og_image" name="og_image" type="file" class="hidden" accept="image/*" onchange="previewImage(this)">
+                            </label>
                         </div>
+                        <input type="hidden" name="remove_og_image" id="remove_og_image" value="false">
                     </div>
                 </div>
             </div>
 
             <!-- Submit Button -->
             <div class="flex justify-end">
-                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Save Settings
+                <button type="submit" 
+                        class="gradient-border rounded-lg">
+                    <span class="px-8 py-3 inline-block text-neon-blue hover:text-neon-purple transition-colors">
+                        <i class="fas fa-save mr-2"></i>
+                        Save Settings
+                    </span>
                 </button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Add this script at the bottom of your settings.html file -->
 <script>
 function previewImage(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
         
         reader.onload = function(e) {
-            const previewContainer = input.closest('.flex-grow').previousElementSibling;
-            let preview;
+            const preview = document.createElement('div');
+            preview.className = 'relative';
+            preview.innerHTML = `
+                <img src="${e.target.result}" class="w-full h-40 object-cover rounded-lg">
+                <button type="button" 
+                        onclick="removeImage(this)"
+                        class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 focus:outline-none">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
             
-            if (previewContainer.querySelector('img')) {
-                preview = previewContainer.querySelector('img');
+            const container = input.closest('.space-y-4');
+            const existingPreview = container.querySelector('.relative');
+            if (existingPreview) {
+                container.replaceChild(preview, existingPreview);
             } else {
-                const div = document.createElement('div');
-                div.className = 'relative';
-                preview = document.createElement('img');
-                preview.className = 'h-32 w-auto rounded-lg shadow-md';
-                const removeButton = document.createElement('button');
-                removeButton.className = 'absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 focus:outline-none';
-                removeButton.innerHTML = `
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                `;
-                removeButton.onclick = function() {
-                    input.value = '';
-                    div.remove();
-                    document.getElementById('remove_og_image').value = 'true';
-                };
-                div.appendChild(preview);
-                div.appendChild(removeButton);
-                previewContainer.innerHTML = '';
-                previewContainer.appendChild(div);
+                container.insertBefore(preview, container.firstChild);
             }
-            
-            preview.src = e.target.result;
         }
         
         reader.readAsDataURL(input.files[0]);
     }
+}
+
+function removeImage(button) {
+    const container = button.closest('.space-y-4');
+    button.closest('.relative').remove();
+    document.getElementById('remove_og_image').value = 'true';
+    document.getElementById('og_image').value = '';
 }
 </script>
 {% endblock %}

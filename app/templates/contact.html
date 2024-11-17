@@ -113,11 +113,13 @@
                 <div class="contact-card rounded-xl border border-neon-blue/20 p-6">
                     <h3 class="text-xl font-bold text-white mb-4">Quick Connect</h3>
                     <div class="space-y-4">
-                        <a href="mailto:{{ site_settings.contact_email if site_settings else 'contact@codevault.com' }}" 
+                        {% if site_settings and site_settings.contact_email %}
+                        <a href="mailto:{{ site_settings.contact_email }}" 
                            class="flex items-center text-gray-300 hover:text-neon-blue transition-colors">
                             <i class="fas fa-envelope w-8"></i>
-                            <span>{{ site_settings.contact_email if site_settings else 'contact@codevault.com' }}</span>
+                            <span>{{ site_settings.contact_email }}</span>
                         </a>
+                        {% endif %}
                         <div class="flex items-center text-gray-300">
                             <i class="fas fa-clock w-8"></i>
                             <span>24/7 Support</span>
@@ -133,22 +135,45 @@
                 <div class="contact-card rounded-xl border border-neon-blue/20 p-6">
                     <h3 class="text-xl font-bold text-white mb-4">Connect on Social</h3>
                     <div class="grid grid-cols-2 gap-4">
+                        {% if site_settings and site_settings.facebook_url %}
+                        <a href="{{ site_settings.facebook_url }}" target="_blank" 
+                           class="flex items-center justify-center p-3 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue transition-all">
+                            <i class="fab fa-facebook-f mr-2"></i>
+                            Facebook
+                        </a>
+                        {% endif %}
+                        
+                        {% if site_settings and site_settings.twitter_url %}
+                        <a href="{{ site_settings.twitter_url }}" target="_blank"
+                           class="flex items-center justify-center p-3 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue transition-all">
+                            <i class="fab fa-twitter mr-2"></i>
+                            Twitter
+                        </a>
+                        {% endif %}
+                        
+                        {% if site_settings and site_settings.instagram_url %}
+                        <a href="{{ site_settings.instagram_url }}" target="_blank"
+                           class="flex items-center justify-center p-3 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue transition-all">
+                            <i class="fab fa-instagram mr-2"></i>
+                            Instagram
+                        </a>
+                        {% endif %}
+                        
+                        {% if site_settings and site_settings.linkedin_url %}
+                        <a href="{{ site_settings.linkedin_url }}" target="_blank"
+                           class="flex items-center justify-center p-3 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue transition-all">
+                            <i class="fab fa-linkedin-in mr-2"></i>
+                            LinkedIn
+                        </a>
+                        {% endif %}
+                        
+                        <!-- Fallback GitHub link if no social links are set -->
+                        {% if not (site_settings and (site_settings.facebook_url or site_settings.twitter_url or site_settings.instagram_url or site_settings.linkedin_url)) %}
                         <a href="#" class="flex items-center justify-center p-3 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue transition-all">
                             <i class="fab fa-github mr-2"></i>
                             GitHub
                         </a>
-                        <a href="#" class="flex items-center justify-center p-3 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue transition-all">
-                            <i class="fab fa-twitter mr-2"></i>
-                            Twitter
-                        </a>
-                        <a href="#" class="flex items-center justify-center p-3 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue transition-all">
-                            <i class="fab fa-discord mr-2"></i>
-                            Discord
-                        </a>
-                        <a href="#" class="flex items-center justify-center p-3 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue transition-all">
-                            <i class="fab fa-linkedin mr-2"></i>
-                            LinkedIn
-                        </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>

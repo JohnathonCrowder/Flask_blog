@@ -205,20 +205,34 @@
                 </div>
 
                 <!-- Social Links -->
-                <div>
-                    <h3 class="text-lg font-semibold text-white mb-4">Connect</h3>
-                    <div class="flex space-x-4">
-                        <a href="#" class="w-10 h-10 rounded-full border border-neon-blue/30 flex items-center justify-center text-gray-400 hover:text-neon-blue hover:border-neon-blue transition-colors">
-                            <i class="fab fa-github"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 rounded-full border border-neon-blue/30 flex items-center justify-center text-gray-400 hover:text-neon-blue hover:border-neon-blue transition-colors">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 rounded-full border border-neon-blue/30 flex items-center justify-center text-gray-400 hover:text-neon-blue hover:border-neon-blue transition-colors">
-                            <i class="fab fa-linkedin"></i>
-                        </a>
-                    </div>
-                </div>
+<div>
+    <h3 class="text-lg font-semibold text-white mb-4">Connect</h3>
+    <div class="flex space-x-4">
+        {% if site_settings and site_settings.facebook_url %}
+        <a href="{{ site_settings.facebook_url }}" target="_blank" class="w-10 h-10 rounded-full border border-neon-blue/30 flex items-center justify-center text-gray-400 hover:text-neon-blue hover:border-neon-blue transition-colors">
+            <i class="fab fa-facebook-f"></i>
+        </a>
+        {% endif %}
+        
+        {% if site_settings and site_settings.twitter_url %}
+        <a href="{{ site_settings.twitter_url }}" target="_blank" class="w-10 h-10 rounded-full border border-neon-blue/30 flex items-center justify-center text-gray-400 hover:text-neon-blue hover:border-neon-blue transition-colors">
+            <i class="fab fa-twitter"></i>
+        </a>
+        {% endif %}
+        
+        {% if site_settings and site_settings.instagram_url %}
+        <a href="{{ site_settings.instagram_url }}" target="_blank" class="w-10 h-10 rounded-full border border-neon-blue/30 flex items-center justify-center text-gray-400 hover:text-neon-blue hover:border-neon-blue transition-colors">
+            <i class="fab fa-instagram"></i>
+        </a>
+        {% endif %}
+        
+        {% if site_settings and site_settings.linkedin_url %}
+        <a href="{{ site_settings.linkedin_url }}" target="_blank" class="w-10 h-10 rounded-full border border-neon-blue/30 flex items-center justify-center text-gray-400 hover:text-neon-blue hover:border-neon-blue transition-colors">
+            <i class="fab fa-linkedin-in"></i>
+        </a>
+        {% endif %}
+    </div>
+</div>
             </div>
 
             <!-- Copyright -->
