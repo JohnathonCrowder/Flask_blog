@@ -1,38 +1,346 @@
 {% extends "base.html" %}
 
+{% block title %}Create Account - CodeVault{% endblock %}
+
+{% block head %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;700&display=swap');
+
+    .register-container {
+        font-family: 'Source Code Pro', monospace;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #0a0a0f;
+        position: relative;
+        overflow: hidden;
+        color: #00ff9f;
+    }
+
+    .scan-lines {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: repeating-linear-gradient(
+            0deg,
+            rgba(0, 0, 0, 0.15),
+            rgba(0, 0, 0, 0.15) 1px,
+            transparent 1px,
+            transparent 2px
+        );
+        pointer-events: none;
+    }
+
+    .terminal-window {
+        background: rgba(0, 0, 0, 0.85);
+        border: 2px solid #00ff9f;
+        border-radius: 8px;
+        padding: 2rem;
+        box-shadow: 0 0 30px rgba(0, 255, 159, 0.3);
+        width: 100%;
+        max-width: 500px;
+        position: relative;
+        animation: flicker 0.15s infinite;
+    }
+
+    @keyframes flicker {
+        0% { opacity: 0.95; }
+        100% { opacity: 1; }
+    }
+
+    .terminal-header {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        height: 30px;
+        background: rgba(0, 255, 159, 0.1);
+        border-radius: 5px 5px 0 0;
+        display: flex;
+        align-items: center;
+        padding: 0 10px;
+    }
+
+    .terminal-buttons span {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 5px;
+    }
+
+    .terminal-buttons span:nth-child(1) { background: #ff5f56; }
+    .terminal-buttons span:nth-child(2) { background: #ffbd2e; }
+    .terminal-buttons span:nth-child(3) { background: #27c93f; }
+
+    .terminal-title {
+        color: #00ff9f;
+        font-size: 0.8rem;
+        margin-left: 20px;
+    }
+
+    .terminal-content {
+        margin-top: 40px;
+    }
+
+    .terminal-text {
+        color: #00ff9f;
+        margin-bottom: 2rem;
+    }
+
+    .typing-animation {
+        display: inline-block;
+        white-space: nowrap;
+        overflow: hidden;
+        border-right: 2px solid #00ff9f;
+        animation: 
+            typing 2s steps(30, end),
+            blink-caret 0.75s step-end infinite;
+    }
+
+    @keyframes typing {
+        from { width: 0; }
+        to { width: 100%; }
+    }
+
+    @keyframes blink-caret {
+        from, to { border-color: transparent; }
+        50% { border-color: #00ff9f; }
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 10px 0;
+        margin-bottom: 1.5rem;
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid #00ff9f;
+        color: #00ff9f;
+        font-family: 'Source Code Pro', monospace;
+        font-size: 1rem;
+    }
+
+    .form-input:focus {
+        outline: none;
+        animation: glow 0.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+        from {
+            text-shadow: 0 0 5px #00ff9f, 0 0 10px #00ff9f;
+        }
+        to {
+            text-shadow: 0 0 10px #00ff9f, 0 0 20px #00ff9f;
+        }
+    }
+
+    .form-input::placeholder {
+        color: rgba(0, 255, 159, 0.5);
+    }
+
+    .register-button {
+        width: 100%;
+        padding: 12px;
+        background: transparent;
+        border: 2px solid #00ff9f;
+        color: #00ff9f;
+        font-family: 'Source Code Pro', monospace;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .register-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(0, 255, 159, 0.2), transparent);
+        transition: all 0.4s ease;
+    }
+
+    .register-button:hover::before {
+        left: 100%;
+    }
+
+    .register-button:hover {
+        background: #00ff9f;
+        color: #0a0a0f;
+        box-shadow: 0 0 20px #00ff9f;
+    }
+
+    .form-links a {
+        color: #00ff9f;
+        text-decoration: none;
+        transition: text-shadow 0.3s ease;
+    }
+
+    .form-links a:hover {
+        text-shadow: 0 0 5px #00ff9f, 0 0 10px #00ff9f;
+    }
+
+    /* Grid Background */
+    .grid-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: 40px 40px;
+        background-image: 
+            linear-gradient(to right, rgba(0, 255, 159, 0.1) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(0, 255, 159, 0.1) 1px, transparent 1px);
+    }
+
+    /* Console Output Style */
+    .console-output {
+        color: rgba(0, 255, 159, 0.7);
+        font-size: 0.8rem;
+        margin-top: 1rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
-        <h1 class="text-2xl font-bold mb-6">Register</h1>
+<div class="register-container">
+    <div class="grid-background"></div>
+    <div class="scan-lines"></div>
+
+    <div class="terminal-window">
+        <div class="terminal-header">
+            <div class="terminal-buttons">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="terminal-title">CodeVault - New User Registration</div>
+        </div>
         
-        <form method="POST">
-            <div class="mb-4">
-                <label class="block mb-2">Username</label>
-                <input type="text" name="username" required
-                       class="w-full px-4 py-2 border rounded">
+        <div class="terminal-content">
+            <div class="terminal-text">
+                <span class="typing-animation">> Initializing new user protocol...</span>
             </div>
-            
-            <div class="mb-4">
-                <label class="block mb-2">Email</label>
-                <input type="email" name="email" required
-                       class="w-full px-4 py-2 border rounded">
+
+            <form method="POST" id="registerForm">
+                <input type="text" 
+                       name="username" 
+                       class="form-input" 
+                       placeholder="Username" 
+                       required>
+                
+                <input type="email" 
+                       name="email" 
+                       class="form-input" 
+                       placeholder="Email" 
+                       required>
+                
+                <input type="password" 
+                       name="password" 
+                       class="form-input" 
+                       placeholder="Password" 
+                       required>
+                
+                <button type="submit" class="register-button">
+                    > Create Account
+                </button>
+            </form>
+
+            <div class="console-output">
+                <div id="consoleMessages"></div>
             </div>
-            
-            <div class="mb-6">
-                <label class="block mb-2">Password</label>
-                <input type="password" name="password" required
-                       class="w-full px-4 py-2 border rounded">
+
+            <div class="form-links mt-6 text-center text-sm">
+                <span>
+                    Already a member? 
+                    <a href="{{ url_for('auth.login') }}">> Access terminal</a>
+                </span>
             </div>
-            
-            <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded">
-                Register
-            </button>
-        </form>
-        
-        <p class="mt-4 text-center">
-            Already have an account? 
-            <a href="{{ url_for('auth.login') }}" class="text-blue-600">Login</a>
-        </p>
+        </div>
     </div>
 </div>
+
+<script>
+    const form = document.getElementById('registerForm');
+    const consoleMessages = document.getElementById('consoleMessages');
+    let warningTimeout;
+
+    const appendConsoleMessage = (message, isWarning = false) => {
+        const messageElement = document.createElement('div');
+        messageElement.textContent = '> ' + message;
+        
+        if (isWarning) {
+            messageElement.style.color = '#ffbd2e'; // Yellow color for warnings
+        }
+        
+        consoleMessages.appendChild(messageElement);
+        consoleMessages.scrollTop = consoleMessages.scrollHeight;
+    };
+
+    const showWarning = (message) => {
+        clearTimeout(warningTimeout);
+        
+        // Remove existing warning messages
+        const existingWarnings = consoleMessages.querySelectorAll('.warning-message');
+        existingWarnings.forEach(warning => warning.remove());
+        
+        const warningElement = document.createElement('div');
+        warningElement.textContent = '> WARNING: ' + message;
+        warningElement.style.color = '#ffbd2e'; // Yellow color for warnings
+        warningElement.className = 'warning-message';
+        
+        consoleMessages.appendChild(warningElement);
+        consoleMessages.scrollTop = consoleMessages.scrollHeight;
+        
+        // Set a timeout to remove the warning after 5 seconds
+        warningTimeout = setTimeout(() => {
+            warningElement.remove();
+        }, 5000);
+    };
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent immediate form submission
+        
+        appendConsoleMessage('Validating user input...');
+        
+        // Simulate processing delay
+        setTimeout(() => {
+            appendConsoleMessage('Encrypting user data...');
+        }, 500);
+
+        setTimeout(() => {
+            appendConsoleMessage('Creating user profile...');
+        }, 1000);
+
+        // Allow form submission after "processing"
+        setTimeout(() => {
+            appendConsoleMessage('Registration complete. Redirecting...');
+            this.submit(); // Actually submit the form
+        }, 1500);
+    });
+
+    // Input validation messages
+    const inputs = form.querySelectorAll('input');
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            if (!this.value) {
+                showWarning(`${this.placeholder} field is empty`);
+            }
+        });
+
+        input.addEventListener('input', function() {
+            if (this.value) {
+                // Remove warning if user starts typing
+                const existingWarnings = consoleMessages.querySelectorAll('.warning-message');
+                existingWarnings.forEach(warning => warning.remove());
+            }
+        });
+    });
+</script>
 {% endblock %}
