@@ -64,6 +64,10 @@
             background-size: 20px 20px;
         }
 
+        html {
+        scroll-behavior: smooth;
+    }
+
         .nav-item {
             position: relative;
             overflow: hidden;
@@ -119,7 +123,7 @@
     <div class="cyber-grid fixed inset-0 z-0 opacity-20"></div>
 
     <!-- Navigation -->
-    <nav class="relative z-10 bg-cyber-darker/80 backdrop-blur-md border-b border-neon-blue/20">
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-cyber-darker/80 backdrop-blur-md border-b border-neon-blue/20">
         <div class="container mx-auto px-6">
             <div class="flex justify-between items-center h-16">
                 <!-- Logo -->
@@ -128,6 +132,7 @@
                         CodeVault
                     </span>
                 </a>
+    
 
                 <!-- Navigation Items -->
                 <div class="hidden md:flex items-center space-x-8">
@@ -169,10 +174,14 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="relative z-10 flex-grow container mx-auto px-6 py-8">
-        {% block content %}{% endblock %}
-    </main>
+    
+    <!-- Add padding to the top of main content to offset the fixed navbar -->
+    <div class="pt-16">
+        <!-- Main Content -->
+        <main class="relative z-10 flex-grow container mx-auto px-6 py-8">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
 
     <!-- Footer -->
     <footer class="relative z-10 bg-cyber-darker/80 backdrop-blur-md border-t border-neon-blue/20">
