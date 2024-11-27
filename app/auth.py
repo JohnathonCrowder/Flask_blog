@@ -13,7 +13,7 @@ def login():
         
         if user and user.check_password(password):
             login_user(user)
-            return redirect(url_for('main.home'))
+            return redirect(url_for('main.user_dashboard'))  # Redirect to dashboard after login
         else:
             flash('Invalid email or password')
     

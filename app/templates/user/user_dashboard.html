@@ -23,6 +23,21 @@
         box-shadow: 0 0 30px rgba(33, 150, 243, 0.3);
     }
 
+    .featured-post-image {
+        width: 100%;
+        height: 16rem; /* 256px - increased from h-48 to h-64 */
+        object-fit: cover;
+        object-position: center;
+    }
+
+    .featured-post-placeholder {
+        width: 100%;
+        height: 16rem; /* 256px - matching the image height */
+        background: linear-gradient(to bottom right, rgba(33, 150, 243, 0.2), rgba(182, 36, 255, 0.2));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
     .post-card {
         background: rgba(15, 23, 42, 0.8);
         border: 1px solid rgba(33, 150, 243, 0.1);
@@ -73,9 +88,9 @@
                     {% if post.featured_image_data %}
                     <img src="{{ url_for('blog.serve_image', post_id=post.id) }}" 
                          alt="{{ post.title }}" 
-                         class="w-full h-48 object-cover">
+                         class="featured-post-image">
                     {% else %}
-                    <div class="w-full h-48 bg-gradient-to-br from-neon-blue/20 to-neon-purple/20 flex items-center justify-center">
+                    <div class="featured-post-placeholder">
                         <i class="fas fa-code text-4xl text-neon-blue/50"></i>
                     </div>
                     {% endif %}
