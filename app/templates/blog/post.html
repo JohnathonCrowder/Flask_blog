@@ -241,19 +241,25 @@
             Related Articles
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {% for i in range(3) %}
+            {% for related_post in related_posts %}
             <div class="post-card rounded-xl border border-neon-blue/20 overflow-hidden">
-                <div class="h-64 bg-gradient-to-br from-neon-blue/20 to-neon-purple/20 flex items-center justify-center">
+                {% if related_post.featured_image_data %}
+                <img src="{{ url_for('blog.serve_image', post_id=related_post.id) }}" 
+                     alt="{{ related_post.title }}" 
+                     class="w-full h-48 object-cover">
+                {% else %}
+                <div class="h-48 bg-gradient-to-br from-neon-blue/20 to-neon-purple/20 flex items-center justify-center">
                     <i class="fas fa-code text-4xl text-neon-blue/50"></i>
                 </div>
+                {% endif %}
                 <div class="p-6">
                     <h3 class="text-xl font-bold text-white hover:text-neon-blue transition-colors mb-2">
-                        <a href="#">Related Article Title</a>
+                        <a href="{{ url_for('blog.post', post_id=related_post.id) }}">{{ related_post.title }}</a>
                     </h3>
                     <p class="text-gray-400 mb-4 line-clamp-2">
-                        Brief description of the related article...
+                        {{ related_post.subtitle or related_post.content|striptags|truncate(100) }}
                     </p>
-                    <a href="#" class="text-neon-blue hover:text-neon-purple transition-colors">
+                    <a href="{{ url_for('blog.post', post_id=related_post.id) }}" class="text-neon-blue hover:text-neon-purple transition-colors">
                         Read More →
                     </a>
                 </div>

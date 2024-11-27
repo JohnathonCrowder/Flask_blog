@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 import io
 from .models import db, Post, User
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 
 blog = Blueprint('blog', __name__)
 
@@ -45,7 +45,13 @@ def post(post_id):
     ):
         abort(404)
     
-    return render_template('blog/post.html', post=post)
+    # Fetch random related posts
+    related_posts = Post.query.filter(
+        Post.id != post_id,
+        Post.status == 'published'
+    ).order_by(func.random()).limit(3).all()
+    
+    return render_template('blog/post.html', post=post, related_posts=related_posts)
 
 @blog.route('/blog/create', methods=['GET', 'POST'])
 @login_required
