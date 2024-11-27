@@ -38,6 +38,25 @@ def about():
 def contact():
     return render_template('contact.html', company_name="{COMPANY_NAME}")
 
+
+
+@main.route('/dashboard')
+def user_dashboard():
+    featured_posts = Post.query.filter_by(status='published').order_by(Post.created_at.desc()).limit(3).all()
+    recent_posts = Post.query.filter_by(status='published').order_by(Post.created_at.desc()).limit(5).all()
+    return render_template('user/user_dashboard.html', 
+                           featured_posts=featured_posts, 
+                           recent_posts=recent_posts)
+
+@main.route('/subscribe', methods=['POST'])
+def subscribe():
+    email = request.form.get('email')
+    # Here you would add logic to handle the subscription
+    # This might involve adding the email to a mailing list service
+    # or storing it in your database
+    flash('Thank you for subscribing!', 'success')
+    return redirect(url_for('main.user_dashboard'))
+
 @main.route('/search')
 def search():
     query = request.args.get('q', '')
