@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash,
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 import io
-from .models import db, Post, User
+from .models import db, Post, User, PostImage
 from sqlalchemy import or_, func
 
 blog = Blueprint('blog', __name__)
@@ -77,22 +77,41 @@ def create():
             author=current_user
         )
         
-        # Handle image upload
+        # Handle featured image
         if 'featured_image' in request.files:
             file = request.files['featured_image']
             if file and file.filename and allowed_file(file.filename):
-                image_data = file.read()
-                mimetype = file.content_type
-                post.featured_image_data = image_data
-                post.featured_image_mimetype = mimetype
+                post.featured_image_data = file.read()
+                post.featured_image_mimetype = file.content_type
+        
+        # Handle content images
+        content_images = request.files.getlist('content_images[]')
+        captions = request.form.getlist('image_captions[]')
+        
+        for i, image_file in enumerate(content_images):
+            if image_file and image_file.filename and allowed_file(image_file.filename):
+                post_image = PostImage(
+                    image_data=image_file.read(),
+                    image_mimetype=image_file.content_type,
+                    caption=captions[i] if i < len(captions) else None,
+                    position=i
+                )
+                post.images.append(post_image)
         
         db.session.add(post)
         db.session.commit()
         
-        flash('Post created successfully!', 'success')
         return redirect(url_for('blog.post', post_id=post.id))
     
     return render_template('blog/create.html')
+
+@blog.route('/blog/content-image/<int:image_id>')
+def serve_content_image(image_id):
+    image = PostImage.query.get_or_404(image_id)
+    return send_file(
+        io.BytesIO(image.image_data),
+        mimetype=image.image_mimetype
+    )
 
 # For editing posts
 @blog.route('/blog/edit/<int:post_id>', methods=['GET', 'POST'])

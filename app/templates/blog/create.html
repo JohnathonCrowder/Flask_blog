@@ -87,7 +87,60 @@
     .submit-button:hover {
         box-shadow: 0 0 20px rgba(33, 150, 243, 0.7);
     }
+
+    .image-upload-container {
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .image-upload-container:hover {
+        transform: translateY(-2px);
+    }
+
+    .remove-image-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(239, 68, 68, 0.9);
+        color: white;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .remove-image-button:hover {
+        background: rgba(239, 68, 68, 1);
+        transform: scale(1.1);
+    }
+
+    .image-caption-input {
+        margin-top: 10px;
+        width: 100%;
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(33, 150, 243, 0.3);
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+        color: #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    .image-caption-input:focus {
+        border-color: #2196f3;
+        box-shadow: 0 0 15px rgba(33, 150, 243, 0.3);
+    }
+
+    .sortable-handle {
+        cursor: move;
+        padding: 5px;
+        color: #60a5fa;
+    }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -164,6 +217,45 @@
                 </div>
             </div>
 
+            <!-- Content Images -->
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">
+                    Content Images
+                </label>
+                <div id="image-uploads" class="space-y-4">
+                    {% if post and post.images %}
+                        {% for image in post.images %}
+                        <div class="image-upload-container" data-image-id="{{ image.id }}">
+                            <div class="sortable-handle">
+                                <i class="fas fa-grip-vertical"></i>
+                            </div>
+                            <div class="image-preview rounded-lg p-6">
+                                <img src="{{ url_for('blog.serve_content_image', image_id=image.id) }}" 
+                                     alt="{{ image.caption or post.title }}"
+                                     class="max-h-64 rounded-lg">
+                                <button type="button" 
+                                        class="remove-image-button"
+                                        onclick="removeExistingImage(this, {{ image.id }})">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <input type="text" 
+                                   name="existing_image_captions[]" 
+                                   value="{{ image.caption or '' }}"
+                                   class="image-caption-input"
+                                   placeholder="Image caption (optional)">
+                            <input type="hidden" name="image_order[]" value="{{ image.id }}">
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <button type="button" 
+                        onclick="addImageUpload()"
+                        class="mt-4 px-4 py-2 border border-neon-blue/30 rounded-lg text-neon-blue hover:bg-neon-blue/10">
+                    <i class="fas fa-plus mr-2"></i>Add Image
+                </button>
+            </div>
+
             <!-- Category and Status -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -234,16 +326,19 @@
                 <button type="submit" 
                         class="submit-button px-8 py-3 rounded-lg text-white font-semibold"
                         onclick="prepareFormSubmission(event)">
-                    <i class="fas fa-rocket mr-2"></i> 
-                    {{ 'Update Post' if is_edit else 'Publish Post' }}
+                    <i class="fas fa-save mr-2"></i> 
+                    {{ 'Update Post' if is_edit else 'Create Post' }}
                 </button>
             </div>
+
+            <!-- Hidden input for deleted images -->
+            <input type="hidden" name="deleted_images" id="deleted-images" value="">
         </form>
     </div>
 </div>
 
 <script>
-    // Quill Editor
+    // Initialize Quill editor
     const quill = new Quill('#editor', {
         theme: 'snow',
         modules: {
@@ -251,7 +346,7 @@
                 [{ 'header': [1, 2, 3, false] }],
                 ['bold', 'italic', 'underline', 'strike'],
                 [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                ['link', 'image', 'code-block'],
+                ['link', 'code-block'],
                 ['clean']
             ]
         }
@@ -262,7 +357,95 @@
         quill.root.innerHTML = {{ post.content|tojson|safe }};
     {% endif %}
 
-    // Image Preview
+    // Initialize Sortable for image reordering
+    new Sortable(document.getElementById('image-uploads'), {
+        handle: '.sortable-handle',
+        animation: 150,
+        onEnd: function() {
+            updateImageOrder();
+        }
+    });
+
+    function updateImageOrder() {
+        const containers = document.querySelectorAll('.image-upload-container');
+        containers.forEach((container, index) => {
+            const orderInput = container.querySelector('input[name="image_order[]"]');
+            if (orderInput)  {
+                orderInput.value = container.dataset.imageId;
+            }
+        });
+    }
+
+    // Image handling functions
+    function addImageUpload() {
+        const container = document.createElement('div');
+        container.className = 'image-upload-container';
+        container.innerHTML = `
+            <div class="sortable-handle">
+                <i class="fas fa-grip-vertical"></i>
+            </div>
+            <div class="image-preview rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer">
+                <input type="file" 
+                       name="content_images[]" 
+                       class="content-image-input hidden" 
+                       accept="image/*"
+                       onchange="previewContentImage(this)">
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt text-4xl text-neon-blue mb-2"></i>
+                    <p class="text-gray-400">Add content image</p>
+                </div>
+                <img class="preview-img hidden max-h-64 mb-4 rounded-lg">
+            </div>
+            <input type="text" 
+                   name="image_captions[]" 
+                   class="image-caption-input"
+                   placeholder="Image caption (optional)">
+            <button type="button" 
+                    onclick="removeImageUpload(this)"
+                    class="remove-image-button">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        document.getElementById('image-uploads').appendChild(container);
+
+        // Make the new container click to upload
+        const preview = container.querySelector('.image-preview');
+        const input = container.querySelector('.content-image-input');
+        preview.addEventListener('click', () => input.click());
+    }
+
+    function previewContentImage(input) {
+        const container = input.closest('.image-upload-container');
+        const preview = container.querySelector('.preview-img');
+        const icon = container.querySelector('.upload-icon');
+        
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+                icon.classList.add('hidden');
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function removeImageUpload(button) {
+        button.closest('.image-upload-container').remove();
+    }
+
+    function removeExistingImage(button, imageId) {
+        const container = button.closest('.image-upload-container');
+        container.remove();
+        
+        // Add the image ID to the deleted images list
+        const deletedImages = document.getElementById('deleted-images');
+        const currentDeleted = deletedImages.value ? deletedImages.value.split(',') : [];
+        currentDeleted.push(imageId);
+        deletedImages.value = currentDeleted.join(',');
+    }
+
+    // Featured image preview
     const imageInput = document.getElementById('featured_image');
     const imagePreview = document.getElementById('image-preview');
     const uploadIcon = document.getElementById('upload-icon');
@@ -273,32 +456,6 @@
     imageInput.addEventListener('change', function() {
         const file = this.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                imagePreview.src = e.target.result;
-                imagePreview.classList.remove('hidden');
-                if (uploadIcon) uploadIcon.classList.add('hidden');
-            }
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // Drag and Drop for Image
-    imagePreviewContainer.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        imagePreviewContainer.classList.add('border-neon-blue');
-    });
-
-    imagePreviewContainer.addEventListener('dragleave', () => {
-        imagePreviewContainer.classList.remove('border-neon-blue');
-    });
-
-    imagePreviewContainer.addEventListener('drop', (e) => {
-        e.preventDefault();
-        imagePreviewContainer.classList.remove('border-neon-blue');
-        const file = e.dataTransfer.files[0];
-        if (file && file.type.startsWith('image/')) {
-            imageInput.files = e.dataTransfer.files;
             const reader = new FileReader();
             reader.onload = function(e) {
                 imagePreview.src = e.target.result;

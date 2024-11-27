@@ -120,6 +120,81 @@
     .share-button:hover {
         transform: translateY(-2px);
     }
+
+    .content-image-container {
+        margin: 2rem 0;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .content-image {
+        width: 100%;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 20px rgba(33, 150, 243, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .content-image:hover {
+        transform: scale(1.01);
+        box-shadow: 0 8px 30px rgba(33, 150, 243, 0.3);
+    }
+
+    .image-caption {
+        text-align: center;
+        color: #94a3b8;
+        margin-top: 0.75rem;
+        font-style: italic;
+        font-size: 0.875rem;
+    }
+
+    .image-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(10, 10, 15, 0.95);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 50;
+        cursor: pointer;
+    }
+
+    .image-overlay img {
+        max-width: 90%;
+        max-height: 90vh;
+        border-radius: 0.5rem;
+        box-shadow: 0 0 30px rgba(33, 150, 243, 0.3);
+    }
+
+    .image-navigation {
+        position: absolute;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 1rem;
+        background: rgba(15, 23, 42, 0.9);
+        padding: 0.5rem 1rem;
+        border-radius: 9999px;
+        border: 1px solid rgba(33, 150, 243, 0.3);
+    }
+
+    .nav-button {
+        background: rgba(33, 150, 243, 0.2);
+        color: #60a5fa;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 9999px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .nav-button:hover {
+        background: rgba(33, 150, 243, 0.3);
+        color: #93c5fd;
+    }
 </style>
 {% endblock %}
 
@@ -184,8 +259,22 @@
 <!-- Main Content -->
 <article class="py-16">
     <div class="container mx-auto max-w-4xl px-4">
-        <!-- Content -->
+        <!-- Content with Images -->
         <div class="prose mx-auto mb-12">
+            {% if post.images %}
+            {% for image in post.images %}
+            <div class="content-image-container" data-image-index="{{ loop.index0 }}">
+                <img src="{{ url_for('blog.serve_content_image', image_id=image.id) }}" 
+                     alt="{{ image.caption or post.title }}"
+                     class="content-image cursor-pointer"
+                     onclick="openImageOverlay({{ loop.index0 }})">
+                {% if image.caption %}
+                <p class="image-caption">{{ image.caption }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+            {% endif %}
+            
             {{ post.content|safe }}
         </div>
 
@@ -221,18 +310,34 @@
 
         <!-- Share Buttons -->
         <div class="flex justify-center space-x-4">
-            <button class="share-button p-3 rounded-full bg-[#1DA1F2]/10 text-[#1DA1F2] hover:bg-[#1DA1F2]/20">
+            <button class="share-button p-3 rounded-full bg-[#1DA1F2]/10 text-[#1DA1F2] hover:bg-[#1DA1F2]/20" 
+                    onclick="shareOnTwitter()">
                 <i class="fab fa-twitter text-xl"></i>
             </button>
-            <button class="share-button p-3 rounded-full bg-[#0A66C2]/10 text-[#0A66C2] hover:bg-[#0A66C2]/20">
+            <button class="share-button p-3 rounded-full bg-[#0A66C2]/10 text-[#0A66C2] hover:bg-[#0A66C2]/20"
+                    onclick="shareOnLinkedIn()">
                 <i class="fab fa-linkedin-in text-xl"></i>
             </button>
-            <button class="share-button p-3 rounded-full bg-neon-blue/10 text-neon-blue hover:bg-neon-blue/20">
+            <button class="share-button p-3 rounded-full bg-neon-blue/10 text-neon-blue hover:bg-neon-blue/20"
+                    onclick="copyToClipboard()">
                 <i class="far fa-copy text-xl"></i>
             </button>
         </div>
     </div>
 </article>
+
+<!-- Image Overlay -->
+<div class="image-overlay" id="imageOverlay" onclick="closeImageOverlay()">
+    <img id="overlayImage" src="" alt="" onclick="event.stopPropagation()">
+    <div class="image-navigation">
+        <button class="nav-button" onclick="event.stopPropagation(); navigateImage(-1)">
+            <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        <button class="nav-button" onclick="event.stopPropagation(); navigateImage(1)">
+            Next <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+</div>
 
 <!-- Related Posts -->
 <section class="py-16 bg-cyber-darker/50">
@@ -260,7 +365,7 @@
                         {{ related_post.subtitle or related_post.content|striptags|truncate(100) }}
                     </p>
                     <a href="{{ url_for('blog.post', post_id=related_post.id) }}" class="text-neon-blue hover:text-neon-purple transition-colors">
-                        Read More →
+                        Rea d More →
                     </a>
                 </div>
             </div>
@@ -315,4 +420,62 @@
     </form>
 </div>
 {% endif %}
+
+<script>
+    let currentImageIndex = 0;
+    const images = {{ post.images|map(attribute='id')|list|tojson|safe if post.images else '[]' }};
+    const baseImageUrl = "{{ url_for('blog.serve_content_image', image_id=0) }}".slice(0, -1);  // Remove the '0' at the end
+    
+    function openImageOverlay(index) {
+        currentImageIndex = index;
+        const overlay = document.getElementById('imageOverlay');
+        const overlayImage = document.getElementById('overlayImage');
+        overlayImage.src = baseImageUrl + images[index];
+        overlay.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeImageOverlay() {
+        const overlay = document.getElementById('imageOverlay');
+        overlay.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    
+    function navigateImage(direction) {
+        currentImageIndex = (currentImageIndex + direction + images.length) % images.length;
+        const overlayImage = document.getElementById('overlayImage');
+        overlayImage.src = baseImageUrl + images[currentImageIndex];
+    }
+    
+    function shareOnTwitter() {
+        const url = window.location.href;
+        const text = "{{ post.title }} via @CodeVault";
+        window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank');
+    }
+    
+    function shareOnLinkedIn() {
+        const url = window.location.href;
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
+    }
+    
+    function copyToClipboard() {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            // Show a notification
+            alert('Link copied to clipboard!');
+        });
+    }
+    
+    // Keyboard navigation for image overlay
+    document.addEventListener('keydown', function(e) {
+        if (document.getElementById('imageOverlay').style.display === 'flex') {
+            if (e.key === 'Escape') {
+                closeImageOverlay();
+            } else if (e.key === 'ArrowLeft') {
+                navigateImage(-1);
+            } else if (e.key === 'ArrowRight') {
+                navigateImage(1);
+            }
+        }
+    });
+    </script>
 {% endblock %}

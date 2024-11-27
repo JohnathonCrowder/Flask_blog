@@ -38,10 +38,20 @@ class Post(db.Model):
     status = db.Column(db.String(20), default='draft')
     featured_image_data = db.Column(db.LargeBinary)  # For storing the actual image data
     featured_image_mimetype = db.Column(db.String(32))  # For storing the image type
+    images = db.relationship('PostImage', backref='post', lazy=True, cascade='all, delete-orphan')
 
     @property
     def tag_list(self):
         return [tag.strip() for tag in self.tags.split(',')] if self.tags else []
+    
+class PostImage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    image_data = db.Column(db.LargeBinary)
+    image_mimetype = db.Column(db.String(32))
+    caption = db.Column(db.String(200))
+    position = db.Column(db.Integer)  # To maintain image order
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
 
 class SiteSettings(db.Model):
