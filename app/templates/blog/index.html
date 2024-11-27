@@ -4,10 +4,6 @@
 
 {% block head %}
 <style>
-    .h-128 {
-        height: 32rem;
-    }
-
     .blog-grid {
         background: 
             linear-gradient(90deg, rgba(33, 150, 243, 0.05) 1px, transparent 1px),
@@ -53,14 +49,16 @@
         box-shadow: 0 0 15px rgba(33, 150, 243, 0.3);
     }
 
-    .author-avatar {
-        background: linear-gradient(45deg, #2196f3, #b624ff);
-        padding: 2px;
+    .search-input {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(33, 150, 243, 0.3);
+        color: #e2e8f0;
+        transition: all 0.3s ease;
     }
 
-    .author-avatar span {
-        display: block;
-        background: #0f172a;
+    .search-input:focus {
+        border-color: #2196f3;
+        box-shadow: 0 0 15px rgba(33, 150, 243, 0.5);
     }
 </style>
 {% endblock %}
@@ -108,16 +106,22 @@
                     <p class="text-gray-400 line-clamp-3">
                         {{ featured_post.subtitle or featured_post.content|striptags|truncate(150) }}
                     </p>
-                    <div class="flex items-center">
-                        <div class="author-avatar rounded-full">
-                            <span class="flex items-center justify-center w-10 h-10 rounded-full text-neon-blue font-bold">
-                                {{ featured_post.author.username[0].upper() }}
-                            </span>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="h-10 w-10 rounded-full bg-gradient-to-r from-neon-blue to-neon-purple p-0.5">
+                                <div class="w-full h-full rounded-full bg-cyber-dark flex items-center justify-center">
+                                    <span class="text-neon-blue font-bold">{{ featured_post.author.username[0].upper() }}</span>
+                                </div>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-gray-300">{{ featured_post.author.username }}</p>
+                                <p class="text-xs text-gray-400">{{ featured_post.created_at.strftime('%B %d, %Y') }}</p>
+                            </div>
                         </div>
-                        <div class="ml-3">
-                            <p class="text-gray-300">{{ featured_post.author.username }}</p>
-                            <p class="text-sm text-gray-500">{{ featured_post.created_at.strftime('%B %d, %Y') }}</p>
-                        </div>
+                        <a href="{{ url_for('blog.post', post_id=featured_post.id) }}" 
+                           class="text-neon-blue hover:text-neon-purple transition-colors">
+                            Read More →
+                        </a>
                     </div>
                 </div>
             </div>
@@ -128,13 +132,16 @@
         <div class="flex flex-wrap gap-4 mb-8">
             <input type="text" 
                    placeholder="Search articles..." 
-                   class="flex-grow px-4 py-2 rounded-lg bg-cyber-darker border border-neon-blue/20 text-gray-300 focus:outline-none focus:ring-2 focus:ring-neon-blue">
+                   class="search-input flex-grow px-4 py-2 rounded-lg focus:outline-none"
+                   id="searchInput">
             
-            {% for category in ['All', 'Python', 'JavaScript', 'DevOps', 'AI/ML', 'Web Development'] %}
-            <button class="filter-button px-4 py-2 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue">
-                {{ category }}
-            </button>
-            {% endfor %}
+            <div class="flex flex-wrap gap-2">
+                {% for category in ['All', 'Python', 'JavaScript', 'DevOps', 'AI/ML', 'Web Development'] %}
+                <button class="filter-button px-4 py-2 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue">
+                    {{ category }}
+                </button>
+                {% endfor %}
+            </div>
         </div>
 
         <!-- Posts Grid -->
@@ -144,9 +151,9 @@
                 {% if post.featured_image_data %}
                 <img src="{{ url_for('blog.serve_image', post_id=post.id) }}" 
                      alt="{{ post.title }}" 
-                     class="w-full h-96 object-cover">
+                     class="w-full h-64 object-cover">
                 {% else %}
-                <div class="w-full h-96 bg-gradient-to-br from-neon-blue/20 to-neon-purple/20 flex items-center justify-center">
+                <div class="w-full h-64 bg-gradient-to-br from-neon-blue/20 to-neon-purple/20 flex items-center justify-center">
                     <i class="fas fa-terminal text-4xl text-neon-blue/50"></i>
                 </div>
                 {% endif %}
@@ -170,10 +177,10 @@
                     
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
-                            <div class="author-avatar rounded-full">
-                                <span class="flex items-center justify-center w-8 h-8 rounded-full text-neon-blue text-sm font-bold">
-                                    {{ post.author.username[0].upper() }}
-                                </span>
+                            <div class="h-8 w-8 rounded-full bg-gradient-to-r from-neon-blue to-neon-purple p-0.5">
+                                <div class="w-full h-full rounded-full bg-cyber-dark flex items-center justify-center">
+                                    <span class="text-neon-blue font-bold text-sm">{{ post.author.username[0].upper() }}</span>
+                                </div>
                             </div>
                             <div class="ml-2">
                                 <p class="text-sm text-gray-400">{{ post.author.username }}</p>
@@ -248,4 +255,47 @@
         </div>
     </div>
 </section>
+
+<script>
+    // Simple search functionality
+    const searchInput = document.getElementById('searchInput');
+    const articles = document.querySelectorAll('article');
+
+    searchInput.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        
+        articles.forEach(article => {
+            const title = article.querySelector('h3').textContent.toLowerCase();
+            const content = article.querySelector('p').textContent.toLowerCase();
+            
+            if (title.includes(searchTerm) || content.includes(searchTerm)) {
+                article.style.display = '';
+            } else {
+                article.style.display = 'none';
+            }
+        });
+    });
+
+    // Category filter functionality
+    const filterButtons = document.querySelectorAll('.filter-button');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const category = this.textContent.trim();
+            
+            filterButtons.forEach(btn => btn.classList.remove('bg-neon-blue', 'text-white'));
+            this.classList.add('bg-neon-blue', 'text-white');
+            
+            articles.forEach(article => {
+                const articleCategory = article.querySelector('.category-pill')?.textContent.trim();
+                
+                if (category === 'All' || articleCategory === category) {
+                    article.style.display = '';
+                } else {
+                    article.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}
