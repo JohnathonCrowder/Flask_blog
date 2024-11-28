@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request
+from flask_login import login_required, current_user, logout_user
 from .models import db, Post, User
 from sqlalchemy import func
 
@@ -77,6 +78,46 @@ def search():
                           company_name="{COMPANY_NAME}",
                           query=query,
                           results=search_results)
+
+
+@main.route('/manage-account', methods=['GET', 'POST'])
+@login_required
+def manage_account():
+    if request.method == 'POST':
+        action = request.form.get('action')
+        
+        if action == 'change_password':
+            current_password = request.form.get('current_password')
+            new_password = request.form.get('new_password')
+            confirm_password = request.form.get('confirm_password')
+            
+            if not current_user.check_password(current_password):
+                flash('Current password is incorrect.', 'error')
+            elif new_password != confirm_password:
+                flash('New passwords do not match.', 'error')
+            else:
+                current_user.set_password(new_password)
+                db.session.commit()
+                flash('Your password has been updated successfully.', 'success')
+                return redirect(url_for('main.manage_account'))
+        
+        elif action == 'delete_account':
+            password = request.form.get('delete_password')
+            if current_user.check_password(password):
+                # Delete user's posts (optional, depending on your needs)
+                Post.query.filter_by(user_id=current_user.id).delete()
+                
+                # Delete the user account
+                db.session.delete(current_user)
+                db.session.commit()
+                
+                logout_user()
+                flash('Your account has been deleted successfully.', 'success')
+                return redirect(url_for('main.home'))
+            else:
+                flash('Incorrect password. Account not deleted.', 'error')
+    
+    return render_template('user/manage_account.html')
 
 # Error handlers
 @main.app_errorhandler(404)

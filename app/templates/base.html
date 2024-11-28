@@ -150,6 +150,10 @@
                             </span>
                         </a>
                         {% endif %}
+                        <a href="{{ url_for('main.manage_account') }}" 
+       class="nav-item text-gray-300 hover:text-white transition-colors">
+        Manage Account
+    </a>
                         <a href="{{ url_for('auth.logout') }}" 
                            class="px-4 py-2 text-gray-300 hover:text-white transition-colors">
                             Logout
