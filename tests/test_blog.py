@@ -1,11 +1,12 @@
-from test_base import BaseTestCase
+from tests.test_base import BaseTestCase
 from app import db
 from app.models import Post, User
 
 class TestBlog(BaseTestCase):
     def setUp(self):
-        super().setUp()  # Important: Call parent's setUp method
-        self.user = self.create_test_user(
+        super().setUp()
+        # Use create_user instead of create_test_user
+        self.user = self.create_user(
             username='admin',
             email='admin@example.com',
             password='adminpass123',
@@ -13,7 +14,6 @@ class TestBlog(BaseTestCase):
         )
 
     def test_create_post(self):
-        # Login as admin
         self.login('admin@example.com', 'adminpass123')
 
         response = self.client.post('/blog/create', data={
