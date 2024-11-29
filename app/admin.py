@@ -88,6 +88,23 @@ def manage_posts():
 
     return render_template('admin/posts.html', posts=posts, authors=authors)
 
+@admin.route('/admin/comments')
+@login_required
+@admin_required
+def manage_comments():
+    comments = Comment.query.order_by(Comment.created_at.desc()).all()
+    return render_template('admin/comments.html', comments=comments)
+
+@admin.route('/admin/comment/<int:comment_id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def delete_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    db.session.delete(comment)
+    db.session.commit()
+    flash('Comment has been deleted.', 'success')
+    return redirect(url_for('admin.manage_comments'))
+
 @admin.route('/admin/settings', methods=['GET', 'POST'])
 @login_required
 @admin_required

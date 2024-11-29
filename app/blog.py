@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash,
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 import io
-from .models import db, Post, User, PostImage
+from .models import db, Post, User, PostImage, Comment
 from sqlalchemy import or_, func
 
 blog = Blueprint('blog', __name__)
@@ -52,6 +52,26 @@ def post(post_id):
     ).order_by(func.random()).limit(3).all()
     
     return render_template('blog/post.html', post=post, related_posts=related_posts)
+
+@blog.route('/post/<int:post_id>/comment', methods=['POST'])
+@login_required
+def add_comment(post_id):
+    post = Post.query.get_or_404(post_id)
+    content = request.form.get('content')
+    
+    if not content:
+        flash('Comment cannot be empty.', 'error')
+    else:
+        comment = Comment(
+            content=content,
+            user=current_user,
+            post=post
+        )
+        db.session.add(comment)
+        db.session.commit()
+        flash('Your comment has been added.', 'success')
+    
+    return redirect(url_for('blog.post', post_id=post_id))
 
 @blog.route('/blog/create', methods=['GET', 'POST'])
 @login_required
