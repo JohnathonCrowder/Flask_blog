@@ -1,14 +1,36 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, abort, send_file
+from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, abort, send_file, jsonify
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 import io
 from .models import db, Post, User, PostImage, Comment
 from sqlalchemy import or_, func
+from datetime import datetime, timedelta
 
 blog = Blueprint('blog', __name__)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
+
+def timeago(date):
+    now = datetime.utcnow()
+    diff = now - date
+    
+    if diff.days > 365:
+        years = diff.days // 365
+        return f"{years}y ago"
+    elif diff.days > 30:
+        months = diff.days // 30
+        return f"{months}mo ago"
+    elif diff.days > 0:
+        return f"{diff.days}d ago"
+    elif diff.seconds > 3600:
+        hours = diff.seconds // 3600
+        return f"{hours}h ago"
+    elif diff.seconds > 60:
+        minutes = diff.seconds // 60
+        return f"{minutes}m ago"
+    else:
+        return "just now"
 
 @blog.route('/blog/image/<int:post_id>')
 def serve_image(post_id):
@@ -18,6 +40,14 @@ def serve_image(post_id):
     return send_file(
         io.BytesIO(post.featured_image_data),
         mimetype=post.featured_image_mimetype
+    )
+
+@blog.route('/blog/content-image/<int:image_id>')
+def serve_content_image(image_id):
+    image = PostImage.query.get_or_404(image_id)
+    return send_file(
+        io.BytesIO(image.image_data),
+        mimetype=image.image_mimetype
     )
 
 @blog.route('/blog')
@@ -52,26 +82,6 @@ def post(post_id):
     ).order_by(func.random()).limit(3).all()
     
     return render_template('blog/post.html', post=post, related_posts=related_posts)
-
-@blog.route('/post/<int:post_id>/comment', methods=['POST'])
-@login_required
-def add_comment(post_id):
-    post = Post.query.get_or_404(post_id)
-    content = request.form.get('content')
-    
-    if not content:
-        flash('Comment cannot be empty.', 'error')
-    else:
-        comment = Comment(
-            content=content,
-            user=current_user,
-            post=post
-        )
-        db.session.add(comment)
-        db.session.commit()
-        flash('Your comment has been added.', 'success')
-    
-    return redirect(url_for('blog.post', post_id=post_id))
 
 @blog.route('/blog/create', methods=['GET', 'POST'])
 @login_required
@@ -125,15 +135,6 @@ def create():
     
     return render_template('blog/create.html')
 
-@blog.route('/blog/content-image/<int:image_id>')
-def serve_content_image(image_id):
-    image = PostImage.query.get_or_404(image_id)
-    return send_file(
-        io.BytesIO(image.image_data),
-        mimetype=image.image_mimetype
-    )
-
-# For editing posts
 @blog.route('/blog/edit/<int:post_id>', methods=['GET', 'POST'])
 @login_required
 def edit(post_id):
@@ -161,12 +162,7 @@ def edit(post_id):
         flash('Post updated successfully!', 'success')
         return redirect(url_for('blog.post', post_id=post.id))
     
-    return render_template('blog/create.html', 
-                          post=post, 
-                          is_edit=True)
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
+    return render_template('blog/create.html', post=post, is_edit=True)
 
 @blog.route('/blog/delete/<int:post_id>', methods=['POST'])
 @login_required
@@ -195,6 +191,59 @@ def author_profile(user_id):
     posts = query.order_by(Post.created_at.desc()).paginate(page=page, per_page=5)
     return render_template('blog/author.html', author=author, posts=posts)
 
+@blog.route('/blog/post/<int:post_id>/comment', methods=['POST'])
+@login_required
+def add_comment(post_id):
+    post = Post.query.get_or_404(post_id)
+    content = request.form.get('content')
+    
+    if not content:
+        flash('Comment cannot be empty.', 'error')
+    else:
+        comment = Comment(
+            content=content,
+            user=current_user,
+            post=post
+        )
+        db.session.add(comment)
+        db.session.commit()
+        flash('Your comment has been added.', 'success')
+    
+    return redirect(url_for('blog.post', post_id=post_id))
+
+@blog.route('/blog/comment/<int:comment_id>/edit', methods=['POST'])
+@login_required
+def edit_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    
+    if comment.user_id != current_user.id and not current_user.is_administrator():
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+    
+    content = request.json.get('content')
+    if not content:
+        return jsonify({'success': False, 'error': 'Content cannot be empty'}), 400
+    
+    comment.content = content
+    db.session.commit()
+    
+    return jsonify({'success': True})
+
+@blog.route('/blog/comment/<int:comment_id>/delete', methods=['POST'])
+@login_required
+def delete_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    
+    if comment.user_id != current_user.id and not current_user.is_administrator():
+        flash('You do not have permission to delete this comment.', 'error')
+        return redirect(url_for('blog.post', post_id=comment.post_id))
+    
+    post_id = comment.post_id
+    db.session.delete(comment)
+    db.session.commit()
+    
+    flash('Comment deleted successfully.', 'success')
+    return redirect(url_for('blog.post', post_id=post_id))
+
 @blog.route('/blog/drafts')
 @login_required
 def drafts():
@@ -205,7 +254,6 @@ def drafts():
     drafts = Post.query.filter_by(status='draft').order_by(Post.created_at.desc()).paginate(page=page, per_page=5)
     return render_template('blog/drafts.html', posts=drafts)
 
-# Optional: Add a search route
 @blog.route('/blog/search')
 def search():
     query = request.args.get('q', '')

@@ -98,8 +98,92 @@ def manage_posts():
 @login_required
 @admin_required
 def manage_comments():
-    comments = Comment.query.order_by(Comment.created_at.desc()).all()
-    return render_template('admin/comments.html', comments=comments)
+    page = request.args.get('page', 1, type=int)
+    filter_by = request.args.get('filter', 'all')
+    search = request.args.get('search', '')
+    sort_by = request.args.get('sort', 'newest')
+
+    # Base query
+    query = Comment.query
+
+    # Apply filters
+    if filter_by == 'today':
+        query = query.filter(Comment.created_at >= datetime.utcnow().date())
+    elif filter_by == 'week':
+        query = query.filter(Comment.created_at >= datetime.utcnow() - timedelta(days=7))
+    elif filter_by == 'flagged':
+        query = query.filter(Comment.is_flagged == True)
+
+    # Apply search
+    if search:
+        query = query.join(User).join(Post).filter(
+            or_(
+                Comment.content.ilike(f'%{search}%'),
+                User.username.ilike(f'%{search}%'),
+                Post.title.ilike(f'%{search}%')
+            )
+        )
+
+    # Apply sorting
+    if sort_by == 'oldest':
+        query = query.order_by(Comment.created_at.asc())
+    else:  # newest
+        query = query.order_by(Comment.created_at.desc())
+
+    # Pagination
+    comments = query.paginate(page=page, per_page=10)
+
+    # Statistics
+    total_comments = Comment.query.count()
+    today_comments = Comment.query.filter(Comment.created_at >= datetime.utcnow().date()).count()
+    week_comments = Comment.query.filter(Comment.created_at >= datetime.utcnow() - timedelta(days=7)).count()
+    flagged_comments = Comment.query.filter(Comment.is_flagged == True).count()
+
+    return render_template('admin/comments.html',
+                          comments=comments,
+                          total_comments=total_comments,
+                          today_comments=today_comments,
+                          week_comments=week_comments,
+                          flagged_comments=flagged_comments,
+                          current_filter=filter_by,
+                          current_sort=sort_by,
+                          search_query=search)
+
+@admin.route('/admin/comment/<int:comment_id>/toggle-flag', methods=['POST'])
+@login_required
+@admin_required
+def toggle_flag_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    comment.is_flagged = not comment.is_flagged
+    db.session.commit()
+    return jsonify({'success': True, 'is_flagged': comment.is_flagged})
+
+@admin.route('/admin/comments/bulk-action', methods=['POST'])
+@login_required
+@admin_required
+def bulk_action_comments():
+    action = request.form.get('action')
+    comment_ids = request.form.getlist('comment_ids[]')
+    
+    if not comment_ids:
+        flash('No comments selected.', 'error')
+        return redirect(url_for('admin.manage_comments'))
+    
+    comments = Comment.query.filter(Comment.id.in_(comment_ids)).all()
+    
+    if action == 'delete':
+        for comment in comments:
+            db.session.delete(comment)
+    elif action == 'flag':
+        for comment in comments:
+            comment.is_flagged = True
+    elif action == 'unflag':
+        for comment in comments:
+            comment.is_flagged = False
+    
+    db.session.commit()
+    flash(f'Bulk action completed on {len(comments)} comments.', 'success')
+    return redirect(url_for('admin.manage_comments'))
 
 @admin.route('/admin/comment/<int:comment_id>/delete', methods=['POST'])
 @login_required

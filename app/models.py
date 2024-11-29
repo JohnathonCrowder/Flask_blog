@@ -51,6 +51,7 @@ class Comment(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    is_flagged = db.Column(db.Boolean, default=False)
     
     # Add relationships
     user = db.relationship('User', backref=db.backref('comments', lazy=True))
