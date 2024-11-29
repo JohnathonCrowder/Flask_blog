@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, current_app, abort, send_file
 from flask_login import login_required, current_user
-from .models import db, User, Post, SiteSettings
+from .models import db, User, Post, SiteSettings, Comment
 from functools import wraps
 from datetime import datetime, timedelta
 from flask import request, url_for
@@ -39,6 +39,10 @@ def admin_dashboard():
     recent_users = User.query.order_by(User.created_at.desc()).limit(5).all()
     recent_posts = Post.query.order_by(Post.created_at.desc()).limit(5).all()
 
+    # Add comment statistics
+    total_comments = Comment.query.count()
+    new_comments_count = Comment.query.filter(Comment.created_at >= seven_days_ago).count()
+    
     return render_template('admin/dashboard.html',
                            total_users=total_users,
                            total_posts=total_posts,
@@ -49,7 +53,9 @@ def admin_dashboard():
                            categories_count=categories_count,
                            popular_category=popular_category,
                            recent_users=recent_users,
-                           recent_posts=recent_posts)
+                           recent_posts=recent_posts,
+                           comments_count=total_comments,         # Add these
+                           new_comments_count=new_comments_count)
 
 @admin.route('/admin/users')
 @login_required
