@@ -243,16 +243,38 @@ class TestComments(BaseTestCase):
 
     def test_comment_search(self):
         """Test searching comments"""
-        self.create_comment('Python programming comment')
-        self.create_comment('JavaScript tutorial comment')
-        self.create_comment('Random comment')
-
-        self.login('admin@example.com', 'adminpass123')
-
-        response = self.client.get('/admin/comments?search=Python')
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Python programming comment', response.data)
-        self.assertNotIn(b'JavaScript tutorial comment', response.data)
+        # Create an admin user
+        admin = self.create_user(username='admin', email='admin@example.com', 
+                                password='adminpass123', is_admin=True)
+        
+        # Create a regular user
+        user = self.create_user(username='regular', email='regular@example.com',
+                            password='regularpass123')
+        
+        # Create a post
+        post = self.create_post(author=admin)
+        
+        # Create comments with different content
+        self.create_comment('Python programming comment', user=user, post=post)
+        self.create_comment('JavaScript tutorial comment', user=user, post=post)
+        
+        # Login as admin
+        with self.client as c:
+            # First, make sure we're logged out
+            c.get('/logout')
+            
+            # Then login as admin
+            response = c.post('/login', data={
+                'email': 'admin@example.com',
+                'password': 'adminpass123'
+            }, follow_redirects=True)
+            
+            # Now try to search comments
+            response = c.get('/admin/comments?search=Python')
+            
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b'Python programming comment', response.data)
+            self.assertNotIn(b'JavaScript tutorial comment', response.data)
 
     def test_comment_pagination(self):
         """Test comment pagination"""

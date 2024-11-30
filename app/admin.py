@@ -99,6 +99,7 @@ def manage_comments():
     search = request.args.get('search', '')
     sort_by = request.args.get('sort', 'newest')
 
+    # Base query
     query = Comment.query
 
     # Apply filters
@@ -111,13 +112,7 @@ def manage_comments():
 
     # Apply search
     if search:
-        query = query.join(User).join(Post).filter(
-            or_(
-                Comment.content.ilike(f'%{search}%'),
-                User.username.ilike(f'%{search}%'),
-                Post.title.ilike(f'%{search}%')
-            )
-        )
+        query = query.filter(Comment.content.ilike(f'%{search}%'))
 
     # Apply sorting
     if sort_by == 'oldest':
@@ -125,13 +120,14 @@ def manage_comments():
     else:  # newest
         query = query.order_by(Comment.created_at.desc())
 
-    comments = query.paginate(page=page, per_page=10)
+    # Pagination
+    comments = query.paginate(page=page, per_page=10, error_out=False)
 
     # Statistics
     total_comments = Comment.query.count()
     today_comments = Comment.query.filter(Comment.created_at >= datetime.utcnow().date()).count()
     week_comments = Comment.query.filter(Comment.created_at >= datetime.utcnow() - timedelta(days=7)).count()
-    flagged_comments = Comment.query.filter_by(is_flagged=True).count()
+    flagged_comments = Comment.query.filter(Comment.is_flagged == True).count()
 
     return render_template('admin/comments.html',
                           comments=comments,
