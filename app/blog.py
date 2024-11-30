@@ -84,13 +84,13 @@ def post(post_id):
     return render_template('blog/post.html', post=post, related_posts=related_posts)
 
 @blog.route('/blog/post/<int:post_id>/comment', methods=['POST'])
-@login_required  # Add this decorator
+@login_required
 def add_comment(post_id):
     post = Post.query.get_or_404(post_id)
     content = request.form.get('content', '').strip()
     
     if not content:
-        flash('Comment cannot be empty', 'error')
+        flash('Comment cannot be empty', 'error')  # Add error category
         return redirect(url_for('blog.post', post_id=post_id))
     
     comment = Comment(

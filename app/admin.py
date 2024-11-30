@@ -103,10 +103,13 @@ def manage_comments():
     query = Comment.query
 
     # Apply filters
+    now = datetime.utcnow()
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     if filter_by == 'today':
-        query = query.filter(Comment.created_at >= datetime.utcnow().date())
+        query = query.filter(Comment.created_at >= today_start)
     elif filter_by == 'week':
-        query = query.filter(Comment.created_at >= datetime.utcnow() - timedelta(days=7))
+        week_ago = now - timedelta(days=7)
+        query = query.filter(Comment.created_at >= week_ago)
     elif filter_by == 'flagged':
         query = query.filter(Comment.is_flagged == True)
 
@@ -120,24 +123,20 @@ def manage_comments():
     else:  # newest
         query = query.order_by(Comment.created_at.desc())
 
+    # Debug print
+    print("\nDebug: Query results")
+    results = query.all()
+    for comment in results:
+        print(f"Comment: {comment.content}, Created: {comment.created_at}")
+
     # Pagination
     comments = query.paginate(page=page, per_page=10, error_out=False)
 
-    # Statistics
-    total_comments = Comment.query.count()
-    today_comments = Comment.query.filter(Comment.created_at >= datetime.utcnow().date()).count()
-    week_comments = Comment.query.filter(Comment.created_at >= datetime.utcnow() - timedelta(days=7)).count()
-    flagged_comments = Comment.query.filter(Comment.is_flagged == True).count()
-
     return render_template('admin/comments.html',
-                          comments=comments,
-                          total_comments=total_comments,
-                          today_comments=today_comments,
-                          week_comments=week_comments,
-                          flagged_comments=flagged_comments,
-                          current_filter=filter_by,
-                          current_sort=sort_by,
-                          search_query=search)
+                         comments=comments,
+                         current_filter=filter_by,
+                         current_sort=sort_by,
+                         search_query=search)
 
 @admin.route('/admin/comment/<int:comment_id>/toggle-flag', methods=['POST'])
 @login_required

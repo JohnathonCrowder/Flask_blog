@@ -217,29 +217,53 @@ class TestComments(BaseTestCase):
 
     def test_comment_filtering(self):
         """Test comment filtering in admin panel"""
-        # Create comments with different dates
         now = datetime.utcnow()
         yesterday = now - timedelta(days=1)
         last_week = now - timedelta(days=7)
 
-        self.create_comment('Today\'s comment', created_at=now)
-        self.create_comment('Yesterday\'s comment', created_at=yesterday)
-        self.create_comment('Last week\'s comment', created_at=last_week)
+        # Create test users and post
+        user = self.create_user(username='regular_user', email='user@example.com', password='password123')
+        post = self.create_post(title='Test Post', author=self.admin)
 
-        self.login('admin@example.com', 'adminpass123')
+        # Create comments with specific dates
+        today_comment = self.create_comment("Today's comment", user=user, post=post)
+        today_comment.created_at = now
+        yesterday_comment = self.create_comment("Yesterday's comment", user=user, post=post)
+        yesterday_comment.created_at = yesterday
+        last_week_comment = self.create_comment("Last week's comment", user=user, post=post)
+        last_week_comment.created_at = last_week
+        
+        # Commit the changes to ensure the timestamps are saved
+        db.session.commit()
+
+        # Login as admin
+        self.login_as_admin()
 
         # Test "today" filter
         response = self.client.get('/admin/comments?filter=today')
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Today\'s comment', response.data)
-        self.assertNotIn(b'Yesterday\'s comment', response.data)
+        
+        # Convert HTML entities in the response data
+        response_text = response.data.decode('utf-8')
+        
+        # Add debug prints
+        print("\nDebug Information:")
+        print(f"Now: {now}")
+        print(f"Today's comment created_at: {today_comment.created_at}")
+        print(f"Response contains 'Today's comment': {'Today&#39;s comment' in response_text}")
+        
+        # Use decoded text for assertions
+        self.assertIn("Today&#39;s comment", response_text)  # HTML-encoded apostrophe
+        self.assertNotIn("Yesterday&#39;s comment", response_text)
 
         # Test "week" filter
         response = self.client.get('/admin/comments?filter=week')
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Today\'s comment', response.data)
-        self.assertIn(b'Yesterday\'s comment', response.data)
-        self.assertNotIn(b'Last week\'s comment', response.data)
+        response_text = response.data.decode('utf-8')
+        
+        self.assertIn("Today&#39;s comment", response_text)
+        self.assertIn("Yesterday&#39;s comment", response_text)
+        self.assertNotIn("Last week&#39;s comment", response_text)
 
     def test_comment_search(self):
         """Test searching comments"""
@@ -278,21 +302,28 @@ class TestComments(BaseTestCase):
 
     def test_comment_pagination(self):
         """Test comment pagination"""
-        # Create more comments than the per_page limit
+        # Create more comments than the per_page limit 
+        user = self.create_user(username='regular_user', email='user@example.com', password='userpass123')
+        post = self.create_post(author=self.admin)  # Create a post for the comments
+        
+        # Create 15 comments (more than default per_page of 10)
         for i in range(15):
-            self.create_comment(f'Comment {i}')
+            self.create_comment(f'Comment {i}', user=user, post=post)
 
-        self.login('admin@example.com', 'adminpass123')
+        # Login as admin to access the admin interface
+        self.login_as_admin()
 
         # Test first page
         response = self.client.get('/admin/comments')
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Comment 0', response.data)
+        # Check for the most recent comment (Comment 14) since they're shown in reverse order
+        self.assertIn(b'Comment 14', response.data)
 
         # Test second page
         response = self.client.get('/admin/comments?page=2')
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Comment 10', response.data)
+        # Check for an earlier comment that should be on the second page
+        self.assertIn(b'Comment 4', response.data)
 
     def test_non_existent_comment(self):
         """Test accessing non-existent comment"""
