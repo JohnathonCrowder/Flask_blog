@@ -83,6 +83,59 @@ def post(post_id):
     
     return render_template('blog/post.html', post=post, related_posts=related_posts)
 
+@blog.route('/blog/post/<int:post_id>/comment', methods=['POST'])
+@login_required  # Add this decorator
+def add_comment(post_id):
+    post = Post.query.get_or_404(post_id)
+    content = request.form.get('content', '').strip()
+    
+    if not content:
+        flash('Comment cannot be empty', 'error')
+        return redirect(url_for('blog.post', post_id=post_id))
+    
+    comment = Comment(
+        content=content,
+        user=current_user,
+        post=post
+    )
+    db.session.add(comment)
+    db.session.commit()
+    flash('Your comment has been added', 'success')
+    
+    return redirect(url_for('blog.post', post_id=post_id))
+
+@blog.route('/blog/comment/<int:comment_id>/edit', methods=['POST'])
+@login_required
+def edit_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    
+    if comment.user != current_user and not current_user.is_administrator():
+        abort(403)
+    
+    content = request.json.get('content', '').strip()
+    if not content:
+        return jsonify({'success': False, 'error': 'Comment cannot be empty'}), 400
+    
+    comment.content = content
+    db.session.commit()
+    
+    return jsonify({'success': True})
+
+@blog.route('/blog/comment/<int:comment_id>/delete', methods=['POST'])
+@login_required
+def delete_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    
+    if comment.user != current_user and not current_user.is_administrator():
+        abort(403)
+    
+    post_id = comment.post_id
+    db.session.delete(comment)
+    db.session.commit()
+    
+    flash('Comment deleted successfully.', 'success')
+    return redirect(url_for('blog.post', post_id=post_id))
+
 @blog.route('/blog/create', methods=['GET', 'POST'])
 @login_required
 def create():
@@ -190,59 +243,6 @@ def author_profile(user_id):
     
     posts = query.order_by(Post.created_at.desc()).paginate(page=page, per_page=5)
     return render_template('blog/author.html', author=author, posts=posts)
-
-@blog.route('/blog/post/<int:post_id>/comment', methods=['POST'])
-@login_required
-def add_comment(post_id):
-    post = Post.query.get_or_404(post_id)
-    content = request.form.get('content')
-    
-    if not content:
-        flash('Comment cannot be empty.', 'error')
-    else:
-        comment = Comment(
-            content=content,
-            user=current_user,
-            post=post
-        )
-        db.session.add(comment)
-        db.session.commit()
-        flash('Your comment has been added.', 'success')
-    
-    return redirect(url_for('blog.post', post_id=post_id))
-
-@blog.route('/blog/comment/<int:comment_id>/edit', methods=['POST'])
-@login_required
-def edit_comment(comment_id):
-    comment = Comment.query.get_or_404(comment_id)
-    
-    if comment.user_id != current_user.id and not current_user.is_administrator():
-        return jsonify({'success': False, 'error': 'Unauthorized'}), 403
-    
-    content = request.json.get('content')
-    if not content:
-        return jsonify({'success': False, 'error': 'Content cannot be empty'}), 400
-    
-    comment.content = content
-    db.session.commit()
-    
-    return jsonify({'success': True})
-
-@blog.route('/blog/comment/<int:comment_id>/delete', methods=['POST'])
-@login_required
-def delete_comment(comment_id):
-    comment = Comment.query.get_or_404(comment_id)
-    
-    if comment.user_id != current_user.id and not current_user.is_administrator():
-        flash('You do not have permission to delete this comment.', 'error')
-        return redirect(url_for('blog.post', post_id=comment.post_id))
-    
-    post_id = comment.post_id
-    db.session.delete(comment)
-    db.session.commit()
-    
-    flash('Comment deleted successfully.', 'success')
-    return redirect(url_for('blog.post', post_id=post_id))
 
 @blog.route('/blog/drafts')
 @login_required

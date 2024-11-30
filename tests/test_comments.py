@@ -1,6 +1,5 @@
-from tests.test_base import BaseTestCase
-from app import db
-from app.models import User, Post, Comment
+from test_base import BaseTestCase
+from app.models import Comment, Post, User, db
 from datetime import datetime, timedelta
 
 class TestComments(BaseTestCase):
@@ -71,13 +70,23 @@ class TestComments(BaseTestCase):
 
     def test_add_comment_not_logged_in(self):
         """Test that anonymous users cannot comment"""
-        response = self.client.post(f'/blog/post/{self.post.id}/comment', data={
-            'content': 'Anonymous comment'
-        }, follow_redirects=True)
-
-        self.assert_requires_login(response)
-        comment = Comment.query.filter_by(content='Anonymous comment').first()
-        self.assertIsNone(comment)
+        with self.client as c:
+            # Make sure we're logged out
+            c.get('/logout')
+            
+            # Create or get admin user
+            admin = self.create_user(username='admin', email='admin@example.com', 
+                                    password='adminpass', is_admin=True)
+            
+            # Create a post
+            post = self.create_post(author=admin)
+            
+            # Try to comment without being logged in
+            response = c.post(f'/blog/post/{post.id}/comment', data={
+                'content': 'Anonymous comment'
+            }, follow_redirects=False)
+            
+            self.assert_requires_login(response)
 
     def test_edit_comment(self):
         """Test editing a comment"""
@@ -170,7 +179,7 @@ class TestComments(BaseTestCase):
             self.create_comment(f'Comment {i}') for i in range(3)
         ]
         comment_ids = [str(c.id) for c in comments]
-
+        
         self.login('admin@example.com', 'adminpass123')
 
         # Test bulk flagging

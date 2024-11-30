@@ -32,7 +32,7 @@ class TestBlog(BaseTestCase):
 
     def test_create_post_unauthorized(self):
         # Create and login as a regular user
-        regular_user = self.create_test_user(
+        regular_user = self.create_user(  # Change from create_test_user to create_user
             username='regular',
             email='regular@example.com',
             password='regularpass123'

@@ -55,12 +55,14 @@ class BaseTestCase(unittest.TestCase):
 
     # User Helper Methods
     def create_user(self, username='testuser', email='test@example.com', 
-                   password='password123', is_admin=False):
-        """Create a test user"""
-        user = User(username=username, email=email, is_admin=is_admin)
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
+                password='password123', is_admin=False):
+        """Create a test user or return existing one"""
+        user = User.query.filter_by(email=email).first()
+        if user is None:
+            user = User(username=username, email=email, is_admin=is_admin)
+            user.set_password(password)
+            db.session.add(user)
+            db.session.commit()
         return user
 
     def create_admin(self, username='admin', email='admin@example.com', 
@@ -82,11 +84,11 @@ class BaseTestCase(unittest.TestCase):
 
     # Post Helper Methods
     def create_post(self, title='Test Post', content='Test Content', 
-                   author=None, status='published', category='Test Category',
-                   tags='test,sample'):
+                author=None, status='published', category='Test Category',
+                tags='test,sample'):
         """Create a test post"""
         if author is None:
-            author = self.create_user()
+            author = self.create_user()  # This will now return existing user if any
         
         post = Post(
             title=title,
@@ -122,6 +124,14 @@ class BaseTestCase(unittest.TestCase):
         db.session.add(comment)
         db.session.commit()
         return comment
+    
+    def login_user(self, user=None):
+        if user is None:
+            user = self.create_user('testuser', 'test@example.com', 'password123')
+        return self.client.post('/login', data={
+            'email': user.email,
+            'password': 'password123'
+        }, follow_redirects=True)
 
     # Authentication Helper Methods
     def login_as_admin(self):
@@ -146,7 +156,8 @@ class BaseTestCase(unittest.TestCase):
 
     def assert_requires_login(self, response):
         """Assert that the response requires login"""
-        self.assert_redirects(response, '/login')
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.location.startswith('/login'))
 
     def assert_requires_admin(self, response):
         """Assert that the response requires admin privileges"""
