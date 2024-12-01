@@ -4,6 +4,8 @@ import os
 import coverage
 from datetime import datetime
 from flask_migrate import upgrade
+from tests.test_commands import TestCommands
+
 
 # Add the project root directory to the Python path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
