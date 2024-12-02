@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user, logout_user
 from .models import db, Post, User
-from sqlalchemy import func
+from sqlalchemy import func, or_
 
 main = Blueprint('main', __name__)
 
@@ -104,13 +104,8 @@ def manage_account():
         elif action == 'delete_account':
             password = request.form.get('delete_password')
             if current_user.check_password(password):
-                # Delete user's posts (optional, depending on your needs)
-                Post.query.filter_by(user_id=current_user.id).delete()
-                
-                # Delete the user account
                 db.session.delete(current_user)
                 db.session.commit()
-                
                 logout_user()
                 flash('Your account has been deleted successfully.', 'success')
                 return redirect(url_for('main.home'))

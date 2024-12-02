@@ -119,6 +119,15 @@
     {% block head %}{% endblock %}
 </head>
 <body class="flex flex-col min-h-full bg-cyber-dark text-gray-100">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flashed-messages">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
     <!-- Animated Background Grid -->
     <div class="cyber-grid fixed inset-0 z-0 opacity-20"></div>
 
