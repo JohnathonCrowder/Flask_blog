@@ -42,12 +42,16 @@ def contact():
 
 
 @main.route('/dashboard')
+@login_required
 def user_dashboard():
+    if not current_user.is_authenticated:
+        return redirect(url_for('auth.login'))
+    
     featured_posts = Post.query.filter_by(status='published').order_by(Post.created_at.desc()).limit(3).all()
     recent_posts = Post.query.filter_by(status='published').order_by(Post.created_at.desc()).limit(5).all()
     return render_template('user/user_dashboard.html', 
-                           featured_posts=featured_posts, 
-                           recent_posts=recent_posts)
+                         featured_posts=featured_posts, 
+                         recent_posts=recent_posts)
 
 @main.route('/subscribe', methods=['POST'])
 def subscribe():
@@ -75,9 +79,8 @@ def search():
         search_results = None
     
     return render_template('search.html', 
-                          company_name="{COMPANY_NAME}",
-                          query=query,
-                          results=search_results)
+                         query=query,
+                         results=search_results)
 
 
 @main.route('/manage-account', methods=['GET', 'POST'])

@@ -5,15 +5,19 @@
 </head>
 <body>
     <h1>Search Results</h1>
-    {% if results %}
-        {% for result in results %}
+    {% if query %}
+        {% if results and results.items %}
+            {% for result in results.items %}
             <div class="search-result">
                 <h2>{{ result.title }}</h2>
                 <p>{{ result.content }}</p>
             </div>
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            <p>No results found for "{{ query }}"</p>
+        {% endif %}
     {% else %}
-        <p>No results found.</p>
+        <p>Please enter a search term</p>
     {% endif %}
 </body>
 </html>
