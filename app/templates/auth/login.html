@@ -1,249 +1,269 @@
-{% extends "base.html" %}
-
-{% block title %}CodeVault Login{% endblock %}
-
+{% extends "base.html" %} {% block title %}Fusion_Code_Lab Login{% endblock %}
 {% block head %}
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;700&display=swap');
+  @import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;700&display=swap");
 
-    .login-container {
-        font-family: 'Source Code Pro', monospace;
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #0a0a0f;
-        position: relative;
-        overflow: hidden;
-        color: #00ff9f;
+  .login-container {
+    font-family: "Source Code Pro", monospace;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0a0a0f;
+    position: relative;
+    overflow: hidden;
+    color: #00ff9f;
+  }
+
+  .scan-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.15),
+      rgba(0, 0, 0, 0.15) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+    pointer-events: none;
+  }
+
+  .terminal-window {
+    background: rgba(0, 0, 0, 0.85);
+    border: 2px solid #00ff9f;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 0 30px rgba(0, 255, 159, 0.3);
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+    animation: flicker 0.15s infinite;
+  }
+
+  @keyframes flicker {
+    0% {
+      opacity: 0.95;
     }
-
-    .scan-lines {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: repeating-linear-gradient(
-            0deg,
-            rgba(0, 0, 0, 0.15),
-            rgba(0, 0, 0, 0.15) 1px,
-            transparent 1px,
-            transparent 2px
-        );
-        pointer-events: none;
+    100% {
+      opacity: 1;
     }
+  }
 
-    .terminal-window {
-        background: rgba(0, 0, 0, 0.85);
-        border: 2px solid #00ff9f;
-        border-radius: 8px;
-        padding: 2rem;
-        box-shadow: 0 0 30px rgba(0, 255, 159, 0.3);
-        width: 100%;
-        max-width: 500px;
-        position: relative;
-        animation: flicker 0.15s infinite;
+  .terminal-header {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    height: 30px;
+    background: rgba(0, 255, 159, 0.1);
+    border-radius: 5px 5px 0 0;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+  }
+
+  .terminal-buttons span {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 5px;
+  }
+
+  .terminal-buttons span:nth-child(1) {
+    background: #ff5f56;
+  }
+  .terminal-buttons span:nth-child(2) {
+    background: #ffbd2e;
+  }
+  .terminal-buttons span:nth-child(3) {
+    background: #27c93f;
+  }
+
+  .terminal-title {
+    color: #00ff9f;
+    font-size: 0.8rem;
+    margin-left: 20px;
+  }
+
+  .terminal-content {
+    margin-top: 40px;
+  }
+
+  .terminal-text {
+    color: #00ff9f;
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: 2px solid #00ff9f;
+    animation: typing 2s steps(20, end), blink-caret 0.75s step-end infinite;
+  }
+
+  @keyframes typing {
+    from {
+      width: 0;
     }
-
-    @keyframes flicker {
-        0% { opacity: 0.95; }
-        100% { opacity: 1; }
+    to {
+      width: 100%;
     }
+  }
 
-    .terminal-header {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        right: 10px;
-        height: 30px;
-        background: rgba(0, 255, 159, 0.1);
-        border-radius: 5px 5px 0 0;
-        display: flex;
-        align-items: center;
-        padding: 0 10px;
+  @keyframes blink-caret {
+    from,
+    to {
+      border-color: transparent;
     }
-
-    .terminal-buttons span {
-        display: inline-block;
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        margin-right: 5px;
+    50% {
+      border-color: #00ff9f;
     }
+  }
 
-    .terminal-buttons span:nth-child(1) { background: #ff5f56; }
-    .terminal-buttons span:nth-child(2) { background: #ffbd2e; }
-    .terminal-buttons span:nth-child(3) { background: #27c93f; }
+  .form-input {
+    width: 100%;
+    padding: 10px 0;
+    margin-bottom: 1.5rem;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid #00ff9f;
+    color: #00ff9f;
+    font-family: "Source Code Pro", monospace;
+    font-size: 1rem;
+  }
 
-    .terminal-title {
-        color: #00ff9f;
-        font-size: 0.8rem;
-        margin-left: 20px;
+  .form-input:focus {
+    outline: none;
+    animation: glow 0.5s ease-in-out infinite alternate;
+  }
+
+  @keyframes glow {
+    from {
+      text-shadow: 0 0 5px #00ff9f, 0 0 10px #00ff9f;
     }
-
-    .terminal-content {
-        margin-top: 40px;
+    to {
+      text-shadow: 0 0 10px #00ff9f, 0 0 20px #00ff9f;
     }
+  }
 
-    .terminal-text {
-        color: #00ff9f;
-        font-size: 1.5rem;
-        margin-bottom: 2rem;
-        white-space: nowrap;
-        overflow: hidden;
-        border-right: 2px solid #00ff9f;
-        animation: 
-            typing 2s steps(20, end),
-            blink-caret 0.75s step-end infinite;
-    }
+  .form-input::placeholder {
+    color: rgba(0, 255, 159, 0.5);
+  }
 
-    @keyframes typing {
-        from { width: 0; }
-        to { width: 100%; }
-    }
+  .login-button {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 2px solid #00ff9f;
+    color: #00ff9f;
+    font-family: "Source Code Pro", monospace;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
 
-    @keyframes blink-caret {
-        from, to { border-color: transparent; }
-        50% { border-color: #00ff9f; }
-    }
+  .login-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(0, 255, 159, 0.2),
+      transparent
+    );
+    transition: all 0.4s ease;
+  }
 
-    .form-input {
-        width: 100%;
-        padding: 10px 0;
-        margin-bottom: 1.5rem;
-        background: transparent;
-        border: none;
-        border-bottom: 2px solid #00ff9f;
-        color: #00ff9f;
-        font-family: 'Source Code Pro', monospace;
-        font-size: 1rem;
-    }
+  .login-button:hover::before {
+    left: 100%;
+  }
 
-    .form-input:focus {
-        outline: none;
-        animation: glow 0.5s ease-in-out infinite alternate;
-    }
+  .login-button:hover {
+    background: #00ff9f;
+    color: #0a0a0f;
+    box-shadow: 0 0 20px #00ff9f;
+  }
 
-    @keyframes glow {
-        from {
-            text-shadow: 0 0 5px #00ff9f, 0 0 10px #00ff9f;
-        }
-        to {
-            text-shadow: 0 0 10px #00ff9f, 0 0 20px #00ff9f;
-        }
-    }
+  .form-links a {
+    color: #00ff9f;
+    text-decoration: none;
+    transition: text-shadow 0.3s ease;
+  }
 
-    .form-input::placeholder {
-        color: rgba(0, 255, 159, 0.5);
-    }
+  .form-links a:hover {
+    text-shadow: 0 0 5px #00ff9f, 0 0 10px #00ff9f;
+  }
 
-    .login-button {
-        width: 100%;
-        padding: 12px;
-        background: transparent;
-        border: 2px solid #00ff9f;
-        color: #00ff9f;
-        font-family: 'Source Code Pro', monospace;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .login-button::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(0, 255, 159, 0.2), transparent);
-        transition: all 0.4s ease;
-    }
-
-    .login-button:hover::before {
-        left: 100%;
-    }
-
-    .login-button:hover {
-        background: #00ff9f;
-        color: #0a0a0f;
-        box-shadow: 0 0 20px #00ff9f;
-    }
-
-    .form-links a {
-        color: #00ff9f;
-        text-decoration: none;
-        transition: text-shadow 0.3s ease;
-    }
-
-    .form-links a:hover {
-        text-shadow: 0 0 5px #00ff9f, 0 0 10px #00ff9f;
-    }
-
-    /* Grid Background */
-    .grid-background {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-size: 40px 40px;
-        background-image: 
-            linear-gradient(to right, rgba(0, 255, 159, 0.1) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(0, 255, 159, 0.1) 1px, transparent 1px);
-    }
+  /* Grid Background */
+  .grid-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: 40px 40px;
+    background-image: linear-gradient(
+        to right,
+        rgba(0, 255, 159, 0.1) 1px,
+        transparent 1px
+      ),
+      linear-gradient(to bottom, rgba(0, 255, 159, 0.1) 1px, transparent 1px);
+  }
 </style>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="login-container">
-    <div class="grid-background"></div>
-    <div class="scan-lines"></div>
+  <div class="grid-background"></div>
+  <div class="scan-lines"></div>
 
-    <div class="terminal-window">
-        <div class="terminal-header">
-            <div class="terminal-buttons">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            <div class="terminal-title">CodeVault Login</div>
-        </div>
-        
-        <div class="terminal-content">
-            <div class="terminal-text">
-                > Enter your credentials_
-            </div>
-
-            <form method="POST">
-                <input type="email" 
-                       name="email" 
-                       class="form-input" 
-                       placeholder="Email" 
-                       required>
-                
-                <input type="password" 
-                       name="password" 
-                       class="form-input" 
-                       placeholder="Password" 
-                       required>
-                
-                <button type="submit" class="login-button">
-                    > Access Granted
-                </button>
-            </form>
-
-            <div class="form-links mt-6 text-center text-sm">
-                <a href="#" class="block mb-2">> Forgot password?</a>
-                <span>
-                    New user? 
-                    <a href="{{ url_for('auth.register') }}">> Create account</a>
-                </span>
-            </div>
-        </div>
+  <div class="terminal-window">
+    <div class="terminal-header">
+      <div class="terminal-buttons">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="terminal-title">Fusion_Code_Lab Login</div>
     </div>
+
+    <div class="terminal-content">
+      <div class="terminal-text">> Enter your credentials_</div>
+
+      <form method="POST">
+        <input
+          type="email"
+          name="email"
+          class="form-input"
+          placeholder="Email"
+          required
+        />
+
+        <input
+          type="password"
+          name="password"
+          class="form-input"
+          placeholder="Password"
+          required
+        />
+
+        <button type="submit" class="login-button">> Access Granted</button>
+      </form>
+
+      <div class="form-links mt-6 text-center text-sm">
+        <a href="#" class="block mb-2">> Forgot password?</a>
+        <span>
+          New user?
+          <a href="{{ url_for('auth.register') }}">> Create account</a>
+        </span>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

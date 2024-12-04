@@ -1,273 +1,324 @@
-{% extends "base.html" %}
-
-{% block title %}Contact - CodeVault{% endblock %}
-
-{% block head %}
+{% extends "base.html" %} {% block title %}Contact - Fusion_Code_Lab{% endblock
+%} {% block head %}
 <style>
-    .contact-grid {
-        background: 
-            linear-gradient(to right, rgba(33, 150, 243, 0.05) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(33, 150, 243, 0.05) 1px, transparent 1px);
-        background-size: 24px 24px;
-    }
+  .contact-grid {
+    background: linear-gradient(
+        to right,
+        rgba(33, 150, 243, 0.05) 1px,
+        transparent 1px
+      ),
+      linear-gradient(to bottom, rgba(33, 150, 243, 0.05) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
 
-    .glow-input {
-        transition: all 0.3s ease;
-    }
+  .glow-input {
+    transition: all 0.3s ease;
+  }
 
-    .glow-input:focus {
-        box-shadow: 0 0 15px rgba(33, 150, 243, 0.3);
-        border-color: #2196f3;
-    }
+  .glow-input:focus {
+    box-shadow: 0 0 15px rgba(33, 150, 243, 0.3);
+    border-color: #2196f3;
+  }
 
-    .contact-card {
-        transition: all 0.3s ease;
-        background: linear-gradient(145deg, rgba(33, 150, 243, 0.05), rgba(182, 36, 255, 0.05));
-    }
+  .contact-card {
+    transition: all 0.3s ease;
+    background: linear-gradient(
+      145deg,
+      rgba(33, 150, 243, 0.05),
+      rgba(182, 36, 255, 0.05)
+    );
+  }
 
-    .contact-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 0 30px rgba(33, 150, 243, 0.15);
-    }
+  .contact-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 30px rgba(33, 150, 243, 0.15);
+  }
 
-    .pulse {
-        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
+  .pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
 
-    @keyframes pulse {
-        0%, 100% {
-            opacity: 1;
-        }
-        50% {
-            opacity: .5;
-        }
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
     }
+    50% {
+      opacity: 0.5;
+    }
+  }
 
-    .circuit-lines {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background-image: 
-            radial-gradient(circle at 100% 100%, rgba(33, 150, 243, 0.1) 0, transparent 50px),
-            radial-gradient(circle at 0% 0%, rgba(182, 36, 255, 0.1) 0, transparent 50px);
-    }
+  .circuit-lines {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(
+        circle at 100% 100%,
+        rgba(33, 150, 243, 0.1) 0,
+        transparent 50px
+      ),
+      radial-gradient(
+        circle at 0% 0%,
+        rgba(182, 36, 255, 0.1) 0,
+        transparent 50px
+      );
+  }
 
-    .status-indicator {
-        position: relative;
-        padding-left: 1.5rem;
-    }
+  .status-indicator {
+    position: relative;
+    padding-left: 1.5rem;
+  }
 
-    .status-indicator::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 0.75rem;
-        height: 0.75rem;
-        border-radius: 50%;
-        background-color: #00ff9f;
-        animation: pulse 2s infinite;
-    }
+  .status-indicator::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background-color: #00ff9f;
+    animation: pulse 2s infinite;
+  }
 </style>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <!-- Hero Section -->
 <section class="contact-grid -mt-8 py-20 px-4 relative overflow-hidden">
-    <div class="circuit-lines"></div>
-    <div class="container mx-auto max-w-6xl relative">
-        <div class="text-center mb-12">
-            <h1 class="text-4xl md:text-6xl font-bold mb-6">
-                <span class="bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink bg-clip-text text-transparent">
-                    Connect With Us
-                </span>
-            </h1>
-            <p class="text-xl text-gray-400 max-w-2xl mx-auto">
-                Have questions? We're here to help. Reach out to our team for support, feedback, or collaboration opportunities.
-            </p>
-        </div>
+  <div class="circuit-lines"></div>
+  <div class="container mx-auto max-w-6xl relative">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl md:text-6xl font-bold mb-6">
+        <span
+          class="bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink bg-clip-text text-transparent"
+        >
+          Connect With Us
+        </span>
+      </h1>
+      <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+        Have questions? We're here to help. Reach out to our team for support,
+        feedback, or collaboration opportunities.
+      </p>
     </div>
+  </div>
 </section>
 
 <!-- Main Content -->
 <section class="py-12">
-    <div class="container mx-auto max-w-6xl px-4">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Contact Information -->
-            <div class="lg:col-span-1 space-y-6">
-                <!-- Status Card -->
-                <div class="contact-card rounded-xl border border-neon-blue/20 p-6">
-                    <h3 class="text-xl font-bold text-white mb-4">System Status</h3>
-                    <div class="space-y-3">
-                        <div class="status-indicator text-gray-300">
-                            Support Team Online
-                        </div>
-                        <div class="text-sm text-gray-400">
-                            Average Response Time: ~2 hours
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Quick Contact Methods -->
-                <div class="contact-card rounded-xl border border-neon-blue/20 p-6">
-                    <h3 class="text-xl font-bold text-white mb-4">Quick Connect</h3>
-                    <div class="space-y-4">
-                        {% if site_settings and site_settings.contact_email %}
-                        <a href="mailto:{{ site_settings.contact_email }}" 
-                           class="flex items-center text-gray-300 hover:text-neon-blue transition-colors">
-                            <i class="fas fa-envelope w-8"></i>
-                            <span>{{ site_settings.contact_email }}</span>
-                        </a>
-                        {% endif %}
-                        <div class="flex items-center text-gray-300">
-                            <i class="fas fa-clock w-8"></i>
-                            <span>24/7 Support</span>
-                        </div>
-                        <div class="flex items-center text-gray-300">
-                            <i class="fas fa-location-dot w-8"></i>
-                            <span>Global Team</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Social Links -->
-                <div class="contact-card rounded-xl border border-neon-blue/20 p-6">
-                    <h3 class="text-xl font-bold text-white mb-4">Connect on Social</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        {% if site_settings and site_settings.facebook_url %}
-                        <a href="{{ site_settings.facebook_url }}" target="_blank" 
-                           class="flex items-center justify-center p-3 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue transition-all">
-                            <i class="fab fa-facebook-f mr-2"></i>
-                            Facebook
-                        </a>
-                        {% endif %}
-                        
-                        {% if site_settings and site_settings.twitter_url %}
-                        <a href="{{ site_settings.twitter_url }}" target="_blank"
-                           class="flex items-center justify-center p-3 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue transition-all">
-                            <i class="fab fa-twitter mr-2"></i>
-                            Twitter
-                        </a>
-                        {% endif %}
-                        
-                        {% if site_settings and site_settings.instagram_url %}
-                        <a href="{{ site_settings.instagram_url }}" target="_blank"
-                           class="flex items-center justify-center p-3 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue transition-all">
-                            <i class="fab fa-instagram mr-2"></i>
-                            Instagram
-                        </a>
-                        {% endif %}
-                        
-                        {% if site_settings and site_settings.linkedin_url %}
-                        <a href="{{ site_settings.linkedin_url }}" target="_blank"
-                           class="flex items-center justify-center p-3 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue transition-all">
-                            <i class="fab fa-linkedin-in mr-2"></i>
-                            LinkedIn
-                        </a>
-                        {% endif %}
-                        
-                        <!-- Fallback GitHub link if no social links are set -->
-                        {% if not (site_settings and (site_settings.facebook_url or site_settings.twitter_url or site_settings.instagram_url or site_settings.linkedin_url)) %}
-                        <a href="#" class="flex items-center justify-center p-3 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue transition-all">
-                            <i class="fab fa-github mr-2"></i>
-                            GitHub
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
+  <div class="container mx-auto max-w-6xl px-4">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Contact Information -->
+      <div class="lg:col-span-1 space-y-6">
+        <!-- Status Card -->
+        <div class="contact-card rounded-xl border border-neon-blue/20 p-6">
+          <h3 class="text-xl font-bold text-white mb-4">System Status</h3>
+          <div class="space-y-3">
+            <div class="status-indicator text-gray-300">
+              Support Team Online
             </div>
-
-            <!-- Contact Form -->
-            <div class="lg:col-span-2">
-                <div class="contact-card rounded-xl border border-neon-blue/20 p-8">
-                    <h2 class="text-2xl font-bold mb-6 bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
-                        Send Us a Message
-                    </h2>
-                    <form action="#" method="POST" class="space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Name</label>
-                                <input type="text" 
-                                       id="name" 
-                                       name="name" 
-                                       required 
-                                       class="w-full px-4 py-3 rounded-lg bg-cyber-darker border border-neon-blue/20 text-gray-300 glow-input focus:outline-none">
-                            </div>
-                            <div>
-                                <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
-                                <input type="email" 
-                                       id="email" 
-                                       name="email" 
-                                       required 
-                                       class="w-full px-4 py-3 rounded-lg bg-cyber-darker border border-neon-blue/20 text-gray-300 glow-input focus:outline-none">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label for="subject" class="block text-sm font-medium text-gray-300 mb-2">Subject</label>
-                            <input type="text" 
-                                   id="subject" 
-                                   name="subject" 
-                                   required 
-                                   class="w-full px-4 py-3 rounded-lg bg-cyber-darker border border-neon-blue/20 text-gray-300 glow-input focus:outline-none">
-                        </div>
-
-                        <div>
-                            <label for="message" class="block text-sm font-medium text-gray-300 mb-2">Message</label>
-                            <textarea id="message" 
-                                      name="message" 
-                                      rows="6" 
-                                      required 
-                                      class="w-full px-4 py-3 rounded-lg bg-cyber-darker border border-neon-blue/20 text-gray-300 glow-input focus:outline-none"></textarea>
-                        </div>
-
-                        <div class="flex items-center">
-                            <button type="submit" 
-                                    class="gradient-border rounded-lg">
-                                <span class="px-8 py-3 inline-block text-neon-blue hover:text-neon-purple transition-colors">
-                                    Send Message
-                                </span>
-                            </button>
-                            <span class="ml-4 text-sm text-gray-400">
-                                <i class="fas fa-shield-alt mr-1"></i>
-                                Your data is secure
-                            </span>
-                        </div>
-                    </form>
-                </div>
+            <div class="text-sm text-gray-400">
+              Average Response Time: ~2 hours
             </div>
+          </div>
         </div>
+
+        <!-- Quick Contact Methods -->
+        <div class="contact-card rounded-xl border border-neon-blue/20 p-6">
+          <h3 class="text-xl font-bold text-white mb-4">Quick Connect</h3>
+          <div class="space-y-4">
+            {% if site_settings and site_settings.contact_email %}
+            <a
+              href="mailto:{{ site_settings.contact_email }}"
+              class="flex items-center text-gray-300 hover:text-neon-blue transition-colors"
+            >
+              <i class="fas fa-envelope w-8"></i>
+              <span>{{ site_settings.contact_email }}</span>
+            </a>
+            {% endif %}
+            <div class="flex items-center text-gray-300">
+              <i class="fas fa-clock w-8"></i>
+              <span>24/7 Support</span>
+            </div>
+            <div class="flex items-center text-gray-300">
+              <i class="fas fa-location-dot w-8"></i>
+              <span>Global Team</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Social Links -->
+        <div class="contact-card rounded-xl border border-neon-blue/20 p-6">
+          <h3 class="text-xl font-bold text-white mb-4">Connect on Social</h3>
+          <div class="grid grid-cols-2 gap-4">
+            {% if site_settings and site_settings.facebook_url %}
+            <a
+              href="{{ site_settings.facebook_url }}"
+              target="_blank"
+              class="flex items-center justify-center p-3 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue transition-all"
+            >
+              <i class="fab fa-facebook-f mr-2"></i>
+              Facebook
+            </a>
+            {% endif %} {% if site_settings and site_settings.twitter_url %}
+            <a
+              href="{{ site_settings.twitter_url }}"
+              target="_blank"
+              class="flex items-center justify-center p-3 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue transition-all"
+            >
+              <i class="fab fa-twitter mr-2"></i>
+              Twitter
+            </a>
+            {% endif %} {% if site_settings and site_settings.instagram_url %}
+            <a
+              href="{{ site_settings.instagram_url }}"
+              target="_blank"
+              class="flex items-center justify-center p-3 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue transition-all"
+            >
+              <i class="fab fa-instagram mr-2"></i>
+              Instagram
+            </a>
+            {% endif %} {% if site_settings and site_settings.linkedin_url %}
+            <a
+              href="{{ site_settings.linkedin_url }}"
+              target="_blank"
+              class="flex items-center justify-center p-3 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue transition-all"
+            >
+              <i class="fab fa-linkedin-in mr-2"></i>
+              LinkedIn
+            </a>
+            {% endif %}
+
+            <!-- Fallback GitHub link if no social links are set -->
+            {% if not (site_settings and (site_settings.facebook_url or
+            site_settings.twitter_url or site_settings.instagram_url or
+            site_settings.linkedin_url)) %}
+            <a
+              href="#"
+              class="flex items-center justify-center p-3 rounded-lg border border-neon-blue/20 text-gray-300 hover:text-neon-blue hover:border-neon-blue transition-all"
+            >
+              <i class="fab fa-github mr-2"></i>
+              GitHub
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Form -->
+      <div class="lg:col-span-2">
+        <div class="contact-card rounded-xl border border-neon-blue/20 p-8">
+          <h2
+            class="text-2xl font-bold mb-6 bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent"
+          >
+            Send Us a Message
+          </h2>
+          <form action="#" method="POST" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label
+                  for="name"
+                  class="block text-sm font-medium text-gray-300 mb-2"
+                  >Name</label
+                >
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  required
+                  class="w-full px-4 py-3 rounded-lg bg-cyber-darker border border-neon-blue/20 text-gray-300 glow-input focus:outline-none"
+                />
+              </div>
+              <div>
+                <label
+                  for="email"
+                  class="block text-sm font-medium text-gray-300 mb-2"
+                  >Email</label
+                >
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  class="w-full px-4 py-3 rounded-lg bg-cyber-darker border border-neon-blue/20 text-gray-300 glow-input focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                for="subject"
+                class="block text-sm font-medium text-gray-300 mb-2"
+                >Subject</label
+              >
+              <input
+                type="text"
+                id="subject"
+                name="subject"
+                required
+                class="w-full px-4 py-3 rounded-lg bg-cyber-darker border border-neon-blue/20 text-gray-300 glow-input focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label
+                for="message"
+                class="block text-sm font-medium text-gray-300 mb-2"
+                >Message</label
+              >
+              <textarea
+                id="message"
+                name="message"
+                rows="6"
+                required
+                class="w-full px-4 py-3 rounded-lg bg-cyber-darker border border-neon-blue/20 text-gray-300 glow-input focus:outline-none"
+              ></textarea>
+            </div>
+
+            <div class="flex items-center">
+              <button type="submit" class="gradient-border rounded-lg">
+                <span
+                  class="px-8 py-3 inline-block text-neon-blue hover:text-neon-purple transition-colors"
+                >
+                  Send Message
+                </span>
+              </button>
+              <span class="ml-4 text-sm text-gray-400">
+                <i class="fas fa-shield-alt mr-1"></i>
+                Your data is secure
+              </span>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
+  </div>
 </section>
 
 <!-- FAQ Section -->
 <section class="py-16 bg-cyber-darker/50">
-    <div class="container mx-auto max-w-4xl px-4">
-        <h2 class="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
-            Frequently Asked Questions
-        </h2>
-        <div class="space-y-4">
-            {% for faq in [
-                {
-                    'question': 'How quickly can I expect a response?',
-                    'answer': 'We typically respond within 2-4 business hours. For urgent matters, please indicate in your subject line.'
-                },
-                {
-                    'question': 'Can I contribute to CodeVault?',
-                    'answer': 'Yes! We welcome contributions from the community. Check our GitHub repository or contact us directly.'
-                },
-                {
-                    'question': 'Do you offer technical support?',
-                    'answer': 'We provide support for our platform and content. For specific technical issues, our community forum is a great resource.'
-                }
-            ] %}
-            <div class="contact-card rounded-xl border border-neon-blue/20 p-6">
-                <h3 class="text-lg font-semibold text-white mb-2">{{ faq.question }}</h3>
-                <p class="text-gray-400">{{ faq.answer }}</p>
-            </div>
-            {% endfor %}
-        </div>
+  <div class="container mx-auto max-w-4xl px-4">
+    <h2
+      class="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent"
+    >
+      Frequently Asked Questions
+    </h2>
+    <div class="space-y-4">
+      {% for faq in [ { 'question': 'How quickly can I expect a response?',
+      'answer': 'We typically respond within 2-4 business hours. For urgent
+      matters, please indicate in your subject line.' }, { 'question': 'Can I
+      contribute to Fusion_Code_Lab?', 'answer': 'Yes! We welcome contributions
+      from the community. Check our GitHub repository or contact us directly.'
+      }, { 'question': 'Do you offer technical support?', 'answer': 'We provide
+      support for our platform and content. For specific technical issues, our
+      community forum is a great resource.' } ] %}
+      <div class="contact-card rounded-xl border border-neon-blue/20 p-6">
+        <h3 class="text-lg font-semibold text-white mb-2">
+          {{ faq.question }}
+        </h3>
+        <p class="text-gray-400">{{ faq.answer }}</p>
+      </div>
+      {% endfor %}
     </div>
+  </div>
 </section>
 {% endblock %}

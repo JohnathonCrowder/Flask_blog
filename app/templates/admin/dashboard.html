@@ -1,217 +1,252 @@
-{% extends "base.html" %}
-
-{% block title %}Admin Dashboard - CodeVault{% endblock %}
-
-{% block head %}
+{% extends "base.html" %} {% block title %}Admin Dashboard - Fusion_Code_Lab{%
+endblock %} {% block head %}
 <style>
-    .dashboard-grid {
-        background: 
-            linear-gradient(90deg, rgba(33, 150, 243, 0.05) 1px, transparent 1px),
-            linear-gradient(rgba(33, 150, 243, 0.05) 1px, transparent 1px);
-        background-size: 40px 40px;
-    }
+  .dashboard-grid {
+    background: linear-gradient(
+        90deg,
+        rgba(33, 150, 243, 0.05) 1px,
+        transparent 1px
+      ),
+      linear-gradient(rgba(33, 150, 243, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
 
-    .stat-card {
-        background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(25, 33, 52, 0.9));
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(33, 150, 243, 0.2);
-        transition: all 0.3s ease;
-    }
+  .stat-card {
+    background: linear-gradient(
+      145deg,
+      rgba(15, 23, 42, 0.9),
+      rgba(25, 33, 52, 0.9)
+    );
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(33, 150, 243, 0.2);
+    transition: all 0.3s ease;
+  }
 
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 0 30px rgba(33, 150, 243, 0.3);
-    }
+  .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 30px rgba(33, 150, 243, 0.3);
+  }
 
-    .action-button {
-        transition: all 0.3s ease;
-    }
+  .action-button {
+    transition: all 0.3s ease;
+  }
 
-    .action-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0 15px rgba(33, 150, 243, 0.4);
-    }
+  .action-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 15px rgba(33, 150, 243, 0.4);
+  }
 
-    .recent-activity-card {
-        background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(25, 33, 52, 0.9));
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(33, 150, 243, 0.2);
-    }
+  .recent-activity-card {
+    background: linear-gradient(
+      145deg,
+      rgba(15, 23, 42, 0.9),
+      rgba(25, 33, 52, 0.9)
+    );
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(33, 150, 243, 0.2);
+  }
 
-    .activity-item {
-        border-left: 2px solid #2196f3;
-        padding-left: 1rem;
-        position: relative;
-    }
+  .activity-item {
+    border-left: 2px solid #2196f3;
+    padding-left: 1rem;
+    position: relative;
+  }
 
-    .activity-item::before {
-        content: '';
-        position: absolute;
-        left: -6px;
-        top: 0;
-        width: 10px;
-        height: 10px;
-        background: #2196f3;
-        border-radius: 50%;
-    }
+  .activity-item::before {
+    content: "";
+    position: absolute;
+    left: -6px;
+    top: 0;
+    width: 10px;
+    height: 10px;
+    background: #2196f3;
+    border-radius: 50%;
+  }
 </style>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="dashboard-grid min-h-screen py-8">
-    <div class="container mx-auto px-4">
-        <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-4xl font-bold bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
-                Admin Dashboard
-            </h1>
-            <p class="text-gray-400 mt-2">Welcome back, {{ current_user.username }}. Here's what's happening:</p>
-        </div>
-
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <!-- Total Users -->
-            <div class="stat-card rounded-xl p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="text-gray-400 text-sm uppercase mb-2">Total Users</h2>
-                        <p class="text-3xl font-bold text-white">{{ total_users }}</p>
-                    </div>
-                    <div class="bg-neon-blue/20 p-3 rounded-full">
-                        <i class="fas fa-users text-neon-blue text-2xl"></i>
-                    </div>
-                </div>
-                <div class="mt-4 text-sm text-gray-400">
-                    <span class="text-neon-green">+{{ new_users_count }}</span> new this week
-                </div>
-            </div>
-
-            <!-- Total Posts -->
-            <div class="stat-card rounded-xl p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="text-gray-400 text-sm uppercase mb-2">Total Posts</h2>
-                        <p class="text-3xl font-bold text-white">{{ total_posts }}</p>
-                    </div>
-                    <div class="bg-neon-purple/20 p-3 rounded-full">
-                        <i class="fas fa-file-alt text-neon-purple text-2xl"></i>
-                    </div>
-                </div>
-                <div class="mt-4 text-sm text-gray-400">
-                    <span class="text-neon-green">+{{ new_posts_count }}</span> new this week
-                </div>
-            </div>
-
-            <!-- Draft Posts -->
-            <div class="stat-card rounded-xl p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="text-gray-400 text-sm uppercase mb-2">Draft Posts</h2>
-                        <p class="text-3xl font-bold text-white">{{ draft_posts_count|default(0) }}</p>
-                    </div>
-                    <div class="bg-neon-green/20 p-3 rounded-full">
-                        <i class="fas fa-pencil-alt text-neon-green text-2xl"></i>
-                    </div>
-                </div>
-                <div class="mt-4 text-sm text-gray-400">
-                    Waiting for review
-                </div>
-            </div>
-
-            <!-- Comments -->
-            <div class="stat-card rounded-xl p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="text-gray-400 text-sm uppercase mb-2">Comments</h2>
-                        <p class="text-3xl font-bold text-white">{{ comments_count|default(0) }}</p>
-                    </div>
-                    <div class="bg-neon-pink/20 p-3 rounded-full">
-                        <i class="fas fa-comments text-neon-pink text-2xl"></i>
-                    </div>
-                </div>
-                <div class="mt-4 text-sm text-gray-400">
-                    <span class="text-neon-green">+{{ new_comments_count|default(0) }}</span> new today
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions and Recent Activity -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <!-- Quick Actions -->
-            <div class="recent-activity-card rounded-xl p-6">
-                <h2 class="text-xl font-bold text-white mb-4">Quick Actions</h2>
-                <div class="space-y-4">
-                    <a href="{{ url_for('blog.create') }}" 
-                       class="action-button block w-full text-center py-3 rounded-lg bg-gradient-to-r from-neon-blue to-neon-purple text-white font-semibold">
-                        <i class="fas fa-plus-circle mr-2"></i> Create New Post
-                    </a>
-                    <a href="{{ url_for('admin.manage_users') }}" 
-                       class="action-button block w-full text-center py-3 rounded-lg bg-neon-blue/20 text-neon-blue border border-neon-blue/30 font-semibold">
-                        <i class="fas fa-users mr-2"></i> Manage Users
-                    </a>
-                    <a href="{{ url_for('admin.manage_posts') }}" 
-                       class="action-button block w-full text-center py-3 rounded-lg bg-neon-purple/20 text-neon-purple border border-neon-purple/30 font-semibold">
-                        <i class="fas fa-file-alt mr-2"></i> Manage Posts
-                    </a>
-                    <a href="{{ url_for('admin.manage_comments') }}" 
-   class="action-button block w-full text-center py-3 rounded-lg bg-neon-pink/20 text-neon-pink border border-neon-pink/30 font-semibold">
-    <i class="fas fa-comments mr-2"></i> Manage Comments
-</a>
-                    <a href="{{ url_for('admin.site_settings') }}" 
-                       class="action-button block w-full text-center py-3 rounded-lg bg-neon-green/20 text-neon-green border border-neon-green/30 font-semibold">
-                        <i class="fas fa-cog mr-2"></i> Site Settings
-                    </a>
-                </div>
-            </div>
-
-            <!-- Recent Users -->
-            <div class="recent-activity-card rounded-xl p-6">
-                <h2 class="text-xl font-bold text-white mb-4">Recent Users</h2>
-                <div class="space-y-4">
-                    {% for user in recent_users %}
-                    <div class="activity-item">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <div class="h-10 w-10 rounded-full bg-neon-blue/20 flex items-center justify-center mr-3">
-                                    <span class="text-neon-blue font-bold">{{ user.username[0].upper() }}</span>
-                                </div>
-                                <div>
-                                    <p class="font-semibold text-white">{{ user.username }}</p>
-                                    <p class="text-sm text-gray-400">{{ user.email }}</p>
-                                </div>
-                            </div>
-                            <span class="text-sm text-gray-500">
-                                {{ user.created_at.strftime('%b %d, %Y') }}
-                            </span>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <!-- Recent Posts -->
-            <div class="recent-activity-card rounded-xl p-6">
-                <h2 class="text-xl font-bold text-white mb-4">Recent Posts</h2>
-                <div class="space-y-4">
-                    {% for post in recent_posts %}
-                    <div class="activity-item">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <a href="{{ url_for('blog.post', post_id=post.id) }}" 
-                                   class="font-semibold text-white hover:text-neon-blue">
-                                    {{ post.title }}
-                                </a>
-                                <p class="text-sm text-gray-400">by {{ post.author.username }}</p>
-                            </div>
-                            <span class="text-sm text-gray-500">
-                                {{ post.created_at.strftime('%b %d, %Y') }}
-                            </span>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
+  <div class="container mx-auto px-4">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1
+        class="text-4xl font-bold bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent"
+      >
+        Admin Dashboard
+      </h1>
+      <p class="text-gray-400 mt-2">
+        Welcome back, {{ current_user.username }}. Here's what's happening:
+      </p>
     </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Total Users -->
+      <div class="stat-card rounded-xl p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-gray-400 text-sm uppercase mb-2">Total Users</h2>
+            <p class="text-3xl font-bold text-white">{{ total_users }}</p>
+          </div>
+          <div class="bg-neon-blue/20 p-3 rounded-full">
+            <i class="fas fa-users text-neon-blue text-2xl"></i>
+          </div>
+        </div>
+        <div class="mt-4 text-sm text-gray-400">
+          <span class="text-neon-green">+{{ new_users_count }}</span> new this
+          week
+        </div>
+      </div>
+
+      <!-- Total Posts -->
+      <div class="stat-card rounded-xl p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-gray-400 text-sm uppercase mb-2">Total Posts</h2>
+            <p class="text-3xl font-bold text-white">{{ total_posts }}</p>
+          </div>
+          <div class="bg-neon-purple/20 p-3 rounded-full">
+            <i class="fas fa-file-alt text-neon-purple text-2xl"></i>
+          </div>
+        </div>
+        <div class="mt-4 text-sm text-gray-400">
+          <span class="text-neon-green">+{{ new_posts_count }}</span> new this
+          week
+        </div>
+      </div>
+
+      <!-- Draft Posts -->
+      <div class="stat-card rounded-xl p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-gray-400 text-sm uppercase mb-2">Draft Posts</h2>
+            <p class="text-3xl font-bold text-white">
+              {{ draft_posts_count|default(0) }}
+            </p>
+          </div>
+          <div class="bg-neon-green/20 p-3 rounded-full">
+            <i class="fas fa-pencil-alt text-neon-green text-2xl"></i>
+          </div>
+        </div>
+        <div class="mt-4 text-sm text-gray-400">Waiting for review</div>
+      </div>
+
+      <!-- Comments -->
+      <div class="stat-card rounded-xl p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-gray-400 text-sm uppercase mb-2">Comments</h2>
+            <p class="text-3xl font-bold text-white">
+              {{ comments_count|default(0) }}
+            </p>
+          </div>
+          <div class="bg-neon-pink/20 p-3 rounded-full">
+            <i class="fas fa-comments text-neon-pink text-2xl"></i>
+          </div>
+        </div>
+        <div class="mt-4 text-sm text-gray-400">
+          <span class="text-neon-green"
+            >+{{ new_comments_count|default(0) }}</span
+          >
+          new today
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions and Recent Activity -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <!-- Quick Actions -->
+      <div class="recent-activity-card rounded-xl p-6">
+        <h2 class="text-xl font-bold text-white mb-4">Quick Actions</h2>
+        <div class="space-y-4">
+          <a
+            href="{{ url_for('blog.create') }}"
+            class="action-button block w-full text-center py-3 rounded-lg bg-gradient-to-r from-neon-blue to-neon-purple text-white font-semibold"
+          >
+            <i class="fas fa-plus-circle mr-2"></i> Create New Post
+          </a>
+          <a
+            href="{{ url_for('admin.manage_users') }}"
+            class="action-button block w-full text-center py-3 rounded-lg bg-neon-blue/20 text-neon-blue border border-neon-blue/30 font-semibold"
+          >
+            <i class="fas fa-users mr-2"></i> Manage Users
+          </a>
+          <a
+            href="{{ url_for('admin.manage_posts') }}"
+            class="action-button block w-full text-center py-3 rounded-lg bg-neon-purple/20 text-neon-purple border border-neon-purple/30 font-semibold"
+          >
+            <i class="fas fa-file-alt mr-2"></i> Manage Posts
+          </a>
+          <a
+            href="{{ url_for('admin.manage_comments') }}"
+            class="action-button block w-full text-center py-3 rounded-lg bg-neon-pink/20 text-neon-pink border border-neon-pink/30 font-semibold"
+          >
+            <i class="fas fa-comments mr-2"></i> Manage Comments
+          </a>
+          <a
+            href="{{ url_for('admin.site_settings') }}"
+            class="action-button block w-full text-center py-3 rounded-lg bg-neon-green/20 text-neon-green border border-neon-green/30 font-semibold"
+          >
+            <i class="fas fa-cog mr-2"></i> Site Settings
+          </a>
+        </div>
+      </div>
+
+      <!-- Recent Users -->
+      <div class="recent-activity-card rounded-xl p-6">
+        <h2 class="text-xl font-bold text-white mb-4">Recent Users</h2>
+        <div class="space-y-4">
+          {% for user in recent_users %}
+          <div class="activity-item">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <div
+                  class="h-10 w-10 rounded-full bg-neon-blue/20 flex items-center justify-center mr-3"
+                >
+                  <span class="text-neon-blue font-bold"
+                    >{{ user.username[0].upper() }}</span
+                  >
+                </div>
+                <div>
+                  <p class="font-semibold text-white">{{ user.username }}</p>
+                  <p class="text-sm text-gray-400">{{ user.email }}</p>
+                </div>
+              </div>
+              <span class="text-sm text-gray-500">
+                {{ user.created_at.strftime('%b %d, %Y') }}
+              </span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Recent Posts -->
+      <div class="recent-activity-card rounded-xl p-6">
+        <h2 class="text-xl font-bold text-white mb-4">Recent Posts</h2>
+        <div class="space-y-4">
+          {% for post in recent_posts %}
+          <div class="activity-item">
+            <div class="flex items-center justify-between">
+              <div>
+                <a
+                  href="{{ url_for('blog.post', post_id=post.id) }}"
+                  class="font-semibold text-white hover:text-neon-blue"
+                >
+                  {{ post.title }}
+                </a>
+                <p class="text-sm text-gray-400">
+                  by {{ post.author.username }}
+                </p>
+              </div>
+              <span class="text-sm text-gray-500">
+                {{ post.created_at.strftime('%b %d, %Y') }}
+              </span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
