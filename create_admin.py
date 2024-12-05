@@ -38,7 +38,7 @@ if __name__ == "__main__":
     # Default admin credentials
     admin_username = "admin"
     admin_email = "admin@gmail.com"
-    admin_password = "admin"
+    admin_password = "JCrowder16"
 
     # Allow command line arguments to override defaults
     if len(sys.argv) > 1:
