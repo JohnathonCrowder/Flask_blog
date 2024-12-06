@@ -36,9 +36,9 @@ def create_admin_user(username, email, password):
 
 if __name__ == "__main__":
     # Default admin credentials
-    admin_username = "admin"
-    admin_email = "admin@gmail.com"
-    admin_password = "JCrowder16"
+    admin_username = "Johnathon_Crowder"
+    admin_email = "JohnathonCrowder@gmail.com"
+    admin_password = "QuietDreamer63?"
 
     # Allow command line arguments to override defaults
     if len(sys.argv) > 1:
