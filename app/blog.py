@@ -61,7 +61,7 @@ def index():
     if not current_user.is_authenticated or not current_user.is_administrator():
         query = query.filter_by(status='published')
     
-    posts = query.order_by(Post.created_at.desc()).paginate(page=page, per_page=5)
+    posts = query.order_by(Post.created_at.desc()).paginate(page=page, per_page=10)
     return render_template('blog/index.html', posts=posts)
 
 @blog.route('/blog/post/<int:post_id>')
