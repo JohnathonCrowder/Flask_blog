@@ -89,6 +89,15 @@ def manage_posts():
     posts = query.order_by(Post.created_at.desc()).paginate(page=page, per_page=10)
     authors = User.query.all()
 
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({
+            'html': render_template('admin/posts_table.html', posts=posts),
+            'has_prev': posts.has_prev,
+            'has_next': posts.has_next,
+            'page': posts.page,
+            'total_pages': posts.pages
+        })
+
     return render_template('admin/posts.html', posts=posts, authors=authors)
 
 @admin.route('/admin/comments')
