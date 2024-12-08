@@ -54,15 +54,21 @@ def serve_content_image(image_id):
 def index():
     page = request.args.get('page', 1, type=int)
     
-    # Base query
-    query = Post.query
+    # Get the newest post for the featured section
+    featured_post = Post.query.filter_by(status='published').order_by(Post.created_at.desc()).first()
     
-    # If user is not admin, only show published posts
-    if not current_user.is_authenticated or not current_user.is_administrator():
-        query = query.filter_by(status='published')
-    
-    posts = query.order_by(Post.created_at.desc()).paginate(page=page, per_page=10)
-    return render_template('blog/index.html', posts=posts)
+    # Query for other posts, excluding the featured one
+    query = Post.query.filter_by(status='published').filter(Post.id != featured_post.id)
+    posts = query.order_by(Post.created_at.desc()).paginate(page=page, per_page=9)
+
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({
+            'html': render_template('blog/posts_list.html', posts=posts),
+            'has_next': posts.has_next,
+            'next_num': posts.next_num
+        })
+
+    return render_template('blog/index.html', featured_post=featured_post, posts=posts)
 
 @blog.route('/blog/post/<int:post_id>')
 def post(post_id):
