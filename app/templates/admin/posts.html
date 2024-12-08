@@ -335,42 +335,48 @@
         </div>
 
         <!-- Pagination -->
-        {% if posts.pages > 1 %}
-        <div class="mt-6 flex justify-center">
-            <nav class="inline-flex rounded-md shadow">
-                {% if posts.has_prev %}
-                    <a href="{{ url_for('admin.manage_posts', page=posts.prev_num, **request.args) }}" 
-                       class="px-3 py-2 rounded-l-md border border-neon-blue/30 text-neon-blue hover:bg-neon-blue/10">
-                        Previous
-                    </a>
-                {% endif %}
-                
-                {% for page in posts.iter_pages() %}
-                    {% if page %}
-                        {% if page != posts.page %}
-                            <a href="{{ url_for('admin.manage_posts', page=page, **request.args) }}" 
-                               class="px-3 py-2 border border-neon-blue/30 text-neon-blue hover:bg-neon-blue/10">
-                                {{ page }}
-                            </a>
-                        {% else %}
-                            <span class="px-3 py-2 bg-neon-blue text-white">
-                                {{ page }}
-                            </span>
-                        {% endif %}
-                    {% else %}
-                        <span class="px-3 py-2 text-gray-500">...</span>
-                    {% endif %}
-                {% endfor %}
-                
-                {% if posts.has_next %}
-                    <a href="{{ url_for('admin.manage_posts', page=posts.next_num, **request.args) }}" 
-                       class="px-3 py-2 rounded-r-md border border-neon-blue/30 text-neon-blue hover:bg-neon-blue/10">
-                        Next
-                    </a>
-                {% endif %}
-            </nav>
-        </div>
+{% if posts.pages > 1 %}
+<div class="mt-6 flex justify-center">
+    <nav class="inline-flex rounded-md shadow">
+        {% if posts.has_prev %}
+            {% set args = request.args.copy() %}
+            {% set _ = args.pop('page', None) %}
+            <a href="{{ url_for('admin.manage_posts', page=posts.prev_num, **args) }}" 
+               class="px-3 py-2 rounded-l-md border border-neon-blue/30 text-neon-blue hover:bg-neon-blue/10">
+                Previous
+            </a>
         {% endif %}
+        
+        {% for page in posts.iter_pages() %}
+            {% if page %}
+                {% if page != posts.page %}
+                    {% set args = request.args.copy() %}
+                    {% set _ = args.pop('page', None) %}
+                    <a href="{{ url_for('admin.manage_posts', page=page, **args) }}" 
+                       class="px-3 py-2 border border-neon-blue/30 text-neon-blue hover:bg-neon-blue/10">
+                        {{ page }}
+                    </a>
+                {% else %}
+                    <span class="px-3 py-2 bg-neon-blue text-white">
+                        {{ page }}
+                    </span>
+                {% endif %}
+            {% else %}
+                <span class="px-3 py-2 text-gray-500">...</span>
+            {% endif %}
+        {% endfor %}
+        
+        {% if posts.has_next %}
+            {% set args = request.args.copy() %}
+            {% set _ = args.pop('page', None) %}
+            <a href="{{ url_for('admin.manage_posts', page=posts.next_num, **args) }}" 
+               class="px-3 py-2 rounded-r-md border border-neon-blue/30 text-neon-blue hover:bg-neon-blue/10">
+                Next
+            </a>
+        {% endif %}
+    </nav>
+</div>
+{% endif %}
     </div>
 </div>
 
